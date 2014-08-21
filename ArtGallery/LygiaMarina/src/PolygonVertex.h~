@@ -5,14 +5,14 @@ class PolygonVertex
 private:
 	int id;
 	float size;
-	float position[2];
-	float color3Float[3];
+	float *position;
+	float *color3Float;
 
 public:
 	PolygonVertex(int id);
-	PolygonVertex(int id, float *position, float size=1.0f);
+	PolygonVertex(int id, float *position, float size=1.0);
 
-	void drawVertex(float *color3Float = {0,0,0});
+	void drawVertex(float *color3Float);
 
 	void setId(int id);
 	int getId();
@@ -25,4 +25,6 @@ public:
 
 	void setColor3Float(float *color3Float);
 	float* getColor3Float();
-}
+
+	void deleteObj();
+};

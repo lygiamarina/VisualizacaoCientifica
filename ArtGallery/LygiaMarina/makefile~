@@ -28,7 +28,7 @@ all: $(BINDIR)/$(APP)
 $(BINDIR)/$(APP): buildrepo $(OBJS)
 	@mkdir -p `dirname $@`
 	@echo "Linking $@..."
-	@$(CC) $(OBJS) $(LDFLAGS) -o $@
+	@$(CC) $(OBJS) $(GLFLAGS) $(LDFLAGS) -o $@
 
 $(OBJDIR)/%.o: %.$(SRCEXT)
 	@echo "Generating dependencies for $<..."
@@ -38,6 +38,7 @@ $(OBJDIR)/%.o: %.$(SRCEXT)
 
 clean:
 	$(RM) -r $(OBJDIR)
+	$(RM) -r $(SRCDIR)/*~
 
 distclean: clean
 	$(RM) -r $(BINDIR)
