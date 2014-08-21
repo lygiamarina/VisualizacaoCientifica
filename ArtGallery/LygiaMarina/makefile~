@@ -34,7 +34,7 @@ $(OBJDIR)/%.o: %.$(SRCEXT)
 	@echo "Generating dependencies for $<..."
 	@$(call make-depend,$<,$@,$(subst .o,.d,$@))
 	@echo "Compiling $<..."
-	@$(CC) $(CFLAGS) $< $(GLFLAGS) -o $@
+	@$(CC) $(CFLAGS) $< -o $@
 
 clean:
 	$(RM) -r $(OBJDIR)

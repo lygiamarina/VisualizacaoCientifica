@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <GL/glut.h>
 
 class PolygonVertex
 {
@@ -13,8 +12,7 @@ public:
 	PolygonVertex(int id);
 	PolygonVertex(int id, pair <float, float> position, float size=1.0f);
 
-	void drawVertexWithoutColor();
-	void drawVertexWithColor();
+	void drawVertex(tuple<float, float, float> color3Float = new tuple<float, float, float>(0,0,0));
 
 	void setId(int id);
 	int getId();

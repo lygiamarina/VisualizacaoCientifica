@@ -14,6 +14,14 @@ PolygonVertex::PolygonVertex(int id, pair<float, float> position, float size=1.0
 }
 
 //Draw methods
+void PolygonVertex::drawVertexWithColorDefault()
+{
+	gl
+	glBegin(GL_POINTS)
+	glVertex2f(this.position.first, this.position.second)
+	glEnd()
+}
+
 void PolygonVertex::drawVertex(tuple<float, float, float> color3Float = new tuple<float, float, float>(0,0,0))
 {
 	this.color3Float = color3Float;
