@@ -1,4 +1,4 @@
-#include <PolygonVertex.h>
+#include "PolygonVertex.h"
 #include <GL/glut.h>
 
 void draw()

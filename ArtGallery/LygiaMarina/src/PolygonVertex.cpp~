@@ -1,33 +1,33 @@
-#include <PolygonVertex.h>
+#include "PolygonVertex.h"
 #include <GL/glut.h>
 
 PolygonVertex::PolygonVertex(int id)
 {
 	this.id = id;
+	this.position = {0,0};
+	this.color3Float = {0,0,0};
 }
 
-PolygonVertex::PolygonVertex(int id, pair<float, float> position, float size=1.0f)
+PolygonVertex::PolygonVertex(int id, float *position, float size=1.0f)
 {
 	this.id = id;
-	this.position = position;
 	this.size = size;
+	this.position[0] = *position;
+	this.position[1] = *(position+1);
+	this.color3Float = {0,0,0};
 }
 
 //Draw methods
-void PolygonVertex::drawVertexWithColorDefault()
+void PolygonVertex::drawVertex(float *color3Float = {0,0,0})
 {
-	gl
+	for (int i = 0; i < 3; i++)
+	{
+		this.color3Float[i] = *(color3Float + i);
+	}
+	
+	glColor3f(this.color3Float[0], this.color3Float[1], this.color3Float[2]);
 	glBegin(GL_POINTS)
-	glVertex2f(this.position.first, this.position.second)
-	glEnd()
-}
-
-void PolygonVertex::drawVertex(tuple<float, float, float> color3Float = new tuple<float, float, float>(0,0,0))
-{
-	this.color3Float = color3Float;
-	glColor3f(get<0>(this.color3Float), get<1>(this.color3Float), get<2>(this.color3Float));
-	glBegin(GL_POINTS)
-	glVertex2f(this.position.first, this.position.second)
+	glVertex2f(this.position[0], this.position[1])
 	glEnd()
 }
 
@@ -52,22 +52,26 @@ float PolygonVertex::getSize()
 	return this.size;
 }
 
-void PolygonVertex::setPosition(pair <float, float> position)
+void PolygonVertex::setPosition(float *position)
 {
-	this.position = position;
+	this.position[0] = *position;
+	this.position[1] = *(position+1);
 }
 
-pair <float, float> PolygonVertex::getPosition()
+float* PolygonVertex::getPosition()
 {
 	return this.position;
 }
 
-void PolygonVertex::setColor3Float(tuple <float, float, float> color3Float)
+void PolygonVertex::setColor3Float(float *color3Float)
 {
-	this.color3Float = color3Float;
+	for (int i = 0; i < 3; i++)
+	{
+		this.color3Float[i] = *(color3Float + i);
+	}
 }
 
-tuple <float, float, float> PolygonVertex::getColor3Float()
+float* PolygonVertex::getColor3Float()
 {
 	return this.color3Float;
 }

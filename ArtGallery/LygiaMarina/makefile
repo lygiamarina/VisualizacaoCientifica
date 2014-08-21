@@ -38,6 +38,7 @@ $(OBJDIR)/%.o: %.$(SRCEXT)
 
 clean:
 	$(RM) -r $(OBJDIR)
+	$(RM) -r $(SRCDIR)/*~
 
 distclean: clean
 	$(RM) -r $(BINDIR)

@@ -5,14 +5,14 @@ class PolygonVertex
 private:
 	int id;
 	float size;
-	pair<float, float> position;
-	tuple<float, float, float> color3Float;
+	float position[2];
+	float color3Float[3];
 
 public:
 	PolygonVertex(int id);
-	PolygonVertex(int id, pair <float, float> position, float size=1.0f);
+	PolygonVertex(int id, float *position, float size=1.0f);
 
-	void drawVertex(tuple<float, float, float> color3Float = new tuple<float, float, float>(0,0,0));
+	void drawVertex(float *color3Float);
 
 	void setId(int id);
 	int getId();
@@ -20,9 +20,9 @@ public:
 	void setSize(float size);
 	float getSize();
 
-	void setPosition(pair <float, float> position);
-	pair<float, float> getPosition();
+	void setPosition(float *position);
+	float* getPosition();
 
-	void setColor3Float(tuple <float, float, float> color3Float);
-	tuple<float, float, float> getColor3Float();
+	void setColor3Float(float *color3Float);
+	float* getColor3Float();
 }
