@@ -3,11 +3,29 @@
 class WindowGeneral
 {
 private:
-	int size[2];
-	int position[2];
+	int *size;
+	int *position;
 	char title;
-	float backgroundColor4Float[4];
+	float *backgroundColor4Float;
 	
 public:
 	WindowGeneral();
+	WindowGeneral(char *title);
+	WindowGeneral(int *size, int *position, float* backgroundColor4Float);
+
+	//Screen
+	void initialize();
+
+	//Get and Set
+	void setSize(int *size);
+	int* getSize();
+
+	void setPosition(int *position);
+	int* getPosition();
+
+	void setTitle(char *title);
+	char getTitle();
+
+	void setBackgroundColor4Float(float *backgroundColor4Float);
+	float* getBackgroundColor4Float();
 };
