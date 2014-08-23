@@ -3,8 +3,6 @@
 class WindowGeneral
 {
 private:
-	static WindowGeneral* currentInstance;
-
 	int *size;
 	int *position;
 	char *title;
@@ -19,8 +17,6 @@ public:
 	//Screen
 	void initialize();
 	void drawBackground();
-	static void drawCallback();
-	void drawDisplay();
 
 	//Get and Set
 	void setSize(int *size);

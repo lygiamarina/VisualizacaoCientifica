@@ -2,25 +2,23 @@
 #include <GL/glut.h>
 #include <string>
 
-WindowGeneral* WindowGeneral::currentInstance = NULL;
-
 WindowGeneral::WindowGeneral()
 {
 	this->size = new int[2];
-	size[0] = 600;
-	size[1] = 480;
+	this->size[0] = 600;
+	this->size[1] = 480;
 
 	this->position = new int[2];
-	position[0] = 50;
-	position[1] = 25;
+	this->position[0] = 50;
+	this->position[1] = 25;
 
 	this->title = "Untitled";
 
 	this->backgroundColor4Float = new float[4];
-	backgroundColor4Float[0] = 0.95;
-	backgroundColor4Float[1] = 0.95;
-	backgroundColor4Float[2] = 0.95;
-	backgroundColor4Float[3] = 0.95;
+	this->backgroundColor4Float[0] = 0.95;
+	this->backgroundColor4Float[1] = 0.95;
+	this->backgroundColor4Float[2] = 0.95;
+	this->backgroundColor4Float[3] = 0.95;
 }
 
 WindowGeneral::WindowGeneral(char *title)
@@ -28,18 +26,18 @@ WindowGeneral::WindowGeneral(char *title)
 	this->title = title;
 
 	this->size = new int[2];
-	size[0] = 600;
-	size[1] = 480;
+	this->size[0] = 600;
+	this->size[1] = 480;
 
 	this->position = new int[2];
-	position[0] = 50;
-	position[1] = 25;
+	this->position[0] = 50;
+	this->position[1] = 25;
 
 	this->backgroundColor4Float = new float[4];
-	backgroundColor4Float[0] = 0.95;
-	backgroundColor4Float[1] = 0.95;
-	backgroundColor4Float[2] = 0.95;
-	backgroundColor4Float[3] = 0.95;
+	this->backgroundColor4Float[0] = 0.95;
+	this->backgroundColor4Float[1] = 0.95;
+	this->backgroundColor4Float[2] = 0.95;
+	this->backgroundColor4Float[3] = 0.95;
 }
 
 WindowGeneral::WindowGeneral(int *size, int *position, float* backgroundColor4Float)
@@ -66,26 +64,17 @@ void WindowGeneral::initialize()
 
 void WindowGeneral::drawBackground()
 {
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0.0, (GLdouble)this->size[0], 0.0, (GLdouble)this->size[1]);
+
 	//Background color
 	glClearColor(this->backgroundColor4Float[0],
 				this->backgroundColor4Float[1],
 				this->backgroundColor4Float[2],
 				this->backgroundColor4Float[3]);
+
 	glClear(GL_COLOR_BUFFER_BIT);
-
-	//Draw order
-	glFlush();
-}
-
-void WindowGeneral::drawCallback()
-{
-	WindowGeneral::currentInstance->drawBackground();
-}
-
-void WindowGeneral::drawDisplay()
-{
-	WindowGeneral::currentInstance = this;
-	glutDisplayFunc(WindowGeneral::drawCallback);
 }
 
 //Get and Set

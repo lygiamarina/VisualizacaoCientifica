@@ -10,11 +10,13 @@ private:
 
 public:
 	PolygonVertex(int id);
-	PolygonVertex(int id, float *position, float size=1.0);
+	PolygonVertex(int id, float *position, float size=5.0);
 	~PolygonVertex();
 
-	void drawVertex(float *color3Float);
-
+	//Drawing methods
+	void initialize();
+	void drawVertex();
+	
 	//Get and Set
 	void setId(int id);
 	int getId();

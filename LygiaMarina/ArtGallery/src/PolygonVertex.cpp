@@ -34,10 +34,18 @@ PolygonVertex::~PolygonVertex()
 	PolygonVertex::deleteObj();
 }
 
-//Draw methods
-void PolygonVertex::drawVertex(float *color3Float)
+//Drawing methods
+void PolygonVertex::initialize()
 {
-	this->color3Float = color3Float;
+	glEnable(GL_POINT_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void PolygonVertex::drawVertex()
+{
+	glPointSize(this->size);
+	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(this->color3Float[0], this->color3Float[1], this->color3Float[2]);
 	glBegin(GL_POINTS);
 	glVertex2f(this->position[0], this->position[1]);
