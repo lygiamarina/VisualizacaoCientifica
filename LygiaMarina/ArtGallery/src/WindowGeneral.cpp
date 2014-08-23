@@ -1,5 +1,6 @@
 #include "WindowGeneral.h"
 #include <GL/glut.h>
+#include <string>
 
 WindowGeneral::WindowGeneral()
 {
@@ -46,6 +47,11 @@ WindowGeneral::WindowGeneral(int *size, int *position, float* backgroundColor4Fl
 	this->backgroundColor4Float = backgroundColor4Float;
 }
 
+WindowGeneral::~WindowGeneral()
+{
+	WindowGeneral::deleteObj();
+}
+
 //Screen
 void WindowGeneral::initialize()
 {
@@ -54,6 +60,30 @@ void WindowGeneral::initialize()
 	glutInitWindowPosition(this->position[0],this->position[1]);
 	glutInitWindowSize(this->size[0],this->size[1]);
 	glutCreateWindow(this->title);
+}
+
+void WindowGeneral::drawBackground()
+{
+	//Background color
+	glClearColor(this->backgroundColor4Float[0],
+				this->backgroundColor4Float[1],
+				this->backgroundColor4Float[2],
+				this->backgroundColor4Float[3]);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	//Draw order
+	glFlush();
+}
+
+void WindowGeneral::drawCallback()
+{
+	currentInstance->drawBackground();
+}
+
+void WindowGeneral::drawDisplay()
+{
+	currentInstance = this;
+	glutDisplayFunc(WindowGeneral::drawCallback);
 }
 
 //Get and Set
@@ -82,7 +112,7 @@ void WindowGeneral::setTitle(char *title)
 	this->title = title;
 }
 
-char WindowGeneral::getTitle()
+char* WindowGeneral::getTitle()
 {
 	return this->title;
 }
@@ -92,7 +122,20 @@ void WindowGeneral::setBackgroundColor4Float(float *backgroundColor4Float)
 	this->backgroundColor4Float = backgroundColor4Float;
 }
 
-float* getBackgroundColor4Float()
+float* WindowGeneral::getBackgroundColor4Float()
 {
 	return this->backgroundColor4Float;
+}
+
+//Common methods
+void WindowGeneral::deleteObj()
+{
+	delete [] this->size;
+	this->size = NULL;
+
+	delete [] this->position;
+	this->position = NULL;
+
+	delete [] this->backgroundColor4Float;
+	this->backgroundColor4Float = NULL;
 }

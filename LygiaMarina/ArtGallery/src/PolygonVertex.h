@@ -15,6 +15,7 @@ public:
 
 	void drawVertex(float *color3Float);
 
+	//Get and Set
 	void setId(int id);
 	int getId();
 
@@ -27,5 +28,6 @@ public:
 	void setColor3Float(float *color3Float);
 	float* getColor3Float();
 
+	//Common methods
 	void deleteObj();
 };

@@ -1,7 +1,8 @@
 #include "PolygonVertex.h"
+#include "WindowGeneral.h"
 #include <GL/glut.h>
 
-void draw()
+/*void draw()
 {
 	//Background color
 	glClearColor(0.95,0.95,0.95,0.95);
@@ -9,21 +10,25 @@ void draw()
 
 	//Draw order
 	glFlush();
-}
+}*/
 
 
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
 
-	//Simple buffer
+	WindowGeneral window;
+	window.initialize();
+	window.drawDisplay();
+
+	/*//Simple buffer
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB );
 	glutInitWindowPosition(50,25);
 	glutInitWindowSize(600,480);
 	glutCreateWindow("Art gallery problem");
 
 	//Call to the drawing function
-	glutDisplayFunc(draw);
+	glutDisplayFunc(draw);*/
 	glutMainLoop();
 	return 0;
 }

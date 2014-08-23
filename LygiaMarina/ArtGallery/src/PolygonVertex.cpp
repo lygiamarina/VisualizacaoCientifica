@@ -85,6 +85,7 @@ float* PolygonVertex::getColor3Float()
 	return this->color3Float;
 }
 
+//Common methods
 void PolygonVertex::deleteObj()
 {
 	delete [] this->position;
