@@ -2,6 +2,8 @@
 #include <GL/glut.h>
 #include <string>
 
+WindowGeneral* WindowGeneral::currentInstance = NULL;
+
 WindowGeneral::WindowGeneral()
 {
 	this->size = new int[2];
@@ -77,12 +79,12 @@ void WindowGeneral::drawBackground()
 
 void WindowGeneral::drawCallback()
 {
-	currentInstance->drawBackground();
+	WindowGeneral::currentInstance->drawBackground();
 }
 
 void WindowGeneral::drawDisplay()
 {
-	currentInstance = this;
+	WindowGeneral::currentInstance = this;
 	glutDisplayFunc(WindowGeneral::drawCallback);
 }
 

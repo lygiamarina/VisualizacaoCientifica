@@ -3,7 +3,7 @@
 class WindowGeneral
 {
 private:
-	static WindowGeneral *currentInstance;
+	static WindowGeneral* currentInstance;
 
 	int *size;
 	int *position;

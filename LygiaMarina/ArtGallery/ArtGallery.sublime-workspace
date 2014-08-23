@@ -3,6 +3,14 @@
 	{
 		"selected_items":
 		[
+			[
+				"draw",
+				"drawBackground"
+			],
+			[
+				"del",
+				"deleteObj"
+			]
 		]
 	},
 	"buffers":
@@ -11,7 +19,7 @@
 			"file": "src/main.cpp",
 			"settings":
 			{
-				"buffer_size": 495,
+				"buffer_size": 599,
 				"line_ending": "Unix"
 			}
 		},
@@ -19,7 +27,7 @@
 			"file": "src/WindowGeneral.h",
 			"settings":
 			{
-				"buffer_size": 548,
+				"buffer_size": 722,
 				"line_ending": "Unix"
 			}
 		},
@@ -27,7 +35,7 @@
 			"file": "src/WindowGeneral.cpp",
 			"settings":
 			{
-				"buffer_size": 1859,
+				"buffer_size": 2648,
 				"line_ending": "Unix"
 			}
 		}
@@ -56,7 +64,8 @@
 	},
 	"file_history":
 	[
-		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/src/PolygonVertex.cpp"
+		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/src/PolygonVertex.cpp",
+		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/src/PolygonVertex.h"
 	],
 	"find":
 	{
@@ -91,7 +100,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -99,15 +108,15 @@
 					"file": "src/main.cpp",
 					"settings":
 					{
-						"buffer_size": 495,
+						"buffer_size": 599,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								407,
-								407
+								179,
+								179
 							]
 						],
 						"settings":
@@ -116,7 +125,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 204.0,
+						"translation.y": 306.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -126,15 +135,15 @@
 					"file": "src/WindowGeneral.h",
 					"settings":
 					{
-						"buffer_size": 548,
+						"buffer_size": 722,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								283,
-								283
+								164,
+								164
 							]
 						],
 						"settings":
@@ -143,7 +152,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 102.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -159,23 +168,24 @@
 					"file": "src/WindowGeneral.cpp",
 					"settings":
 					{
-						"buffer_size": 1859,
+						"buffer_size": 2648,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1196,
-								1196
+								1726,
+								1726
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 816.0,
+						"translation.y": 2193.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -189,7 +199,7 @@
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 33.0
 	},
 	"layout":
 	{
