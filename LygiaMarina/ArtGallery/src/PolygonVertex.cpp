@@ -1,37 +1,38 @@
 #include "PolygonVertex.h"
 #include <GL/glut.h>
+#include <iostream>
 
-PolygonVertex::PolygonVertex(int id)
-{
-	this->id = id;
-
-	this->position = new float[2];
-	this->position[0] = 0.0;
-	this->position[1] = 0.0;
-
-	this->color3Float = new float[3];
-	this->color3Float[0] = 0.0;
-	this->color3Float[1] = 0.0;
-	this->color3Float[2] = 0.0;
-}
-
-PolygonVertex::PolygonVertex(int id, float *position, float size)
+PolygonVertex::PolygonVertex(int id, float xPosition, float yPosition, float size)
 {
 	this->id = id;
 
 	this->size = size;
 
-	this->position = position;
+	this->setPosition(xPosition, yPosition);
+
+	this->setColor3Float(0.5, 0.0, 0.0);
+}
+
+PolygonVertex::PolygonVertex(const PolygonVertex &vertex)
+{
+	this->id = vertex.id;
+
+	this->size = vertex.size;
+
+	this->position = new float[2];
+	*this->position = *vertex.position;
+	*(this->position+1) = *(vertex.position+1);
 
 	this->color3Float = new float[3];
-	this->color3Float[0] = 0.0;
-	this->color3Float[1] = 0.0;
-	this->color3Float[2] = 0.0;
+	for (int i = 0; i < 3; i++)
+	{
+		*(this->color3Float+i) = *(vertex.color3Float+i);
+	}
 }
 
 PolygonVertex::~PolygonVertex()
 {
-	PolygonVertex::deleteObj();
+	this->deleteObj();
 }
 
 //Drawing methods
@@ -45,7 +46,6 @@ void PolygonVertex::initialize()
 void PolygonVertex::drawVertex()
 {
 	glPointSize(this->size);
-	glClear(GL_COLOR_BUFFER_BIT);
 	glColor3f(this->color3Float[0], this->color3Float[1], this->color3Float[2]);
 	glBegin(GL_POINTS);
 	glVertex2f(this->position[0], this->position[1]);
@@ -73,9 +73,11 @@ float PolygonVertex::getSize()
 	return this->size;
 }
 
-void PolygonVertex::setPosition(float *position)
+void PolygonVertex::setPosition(float xPosition, float yPosition)
 {
-	this->position = position;
+	this->position = new float[2];
+	this->position[0] = xPosition;
+	this->position[1] = yPosition;
 }
 
 float* PolygonVertex::getPosition()
@@ -83,9 +85,12 @@ float* PolygonVertex::getPosition()
 	return this->position;
 }
 
-void PolygonVertex::setColor3Float(float *color3Float)
+void PolygonVertex::setColor3Float(float R, float G, float B)
 {
-	this->color3Float = color3Float;
+	this->color3Float = new float[3];
+	this->color3Float[0] = R;
+	this->color3Float[1] = G;
+	this->color3Float[2] = B;
 }
 
 float* PolygonVertex::getColor3Float()

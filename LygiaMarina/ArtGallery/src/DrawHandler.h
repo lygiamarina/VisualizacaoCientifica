@@ -15,6 +15,7 @@ private:
 
 public:
 	DrawHandler();
+	~DrawHandler();
 
 	void initialize();
 	void drawOrder();
@@ -22,7 +23,7 @@ public:
 	void draw();
 
 	//Set and Get
-	void setWindow(WindowGeneral window);
+	void setWindow(WindowGeneral &window);
 	WindowGeneral getWindow();
 
 	void setPolygonVertexVector(std::vector<PolygonVertex> vertices);

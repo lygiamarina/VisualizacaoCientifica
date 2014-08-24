@@ -1,86 +1,73 @@
 #include "WindowGeneral.h"
 #include <GL/glut.h>
 #include <string>
-
-WindowGeneral::WindowGeneral()
-{
-	this->size = new int[2];
-	this->size[0] = 600;
-	this->size[1] = 480;
-
-	this->position = new int[2];
-	this->position[0] = 50;
-	this->position[1] = 25;
-
-	this->title = "Untitled";
-
-	this->backgroundColor4Float = new float[4];
-	this->backgroundColor4Float[0] = 0.95;
-	this->backgroundColor4Float[1] = 0.95;
-	this->backgroundColor4Float[2] = 0.95;
-	this->backgroundColor4Float[3] = 0.95;
-}
+#include <iostream>
 
 WindowGeneral::WindowGeneral(char *title)
 {
 	this->title = title;
 
-	this->size = new int[2];
-	this->size[0] = 600;
-	this->size[1] = 480;
+	this->setSize(600, 480);
 
-	this->position = new int[2];
-	this->position[0] = 50;
-	this->position[1] = 25;
+	this->setPosition(50, 25);
 
-	this->backgroundColor4Float = new float[4];
-	this->backgroundColor4Float[0] = 0.95;
-	this->backgroundColor4Float[1] = 0.95;
-	this->backgroundColor4Float[2] = 0.95;
-	this->backgroundColor4Float[3] = 0.95;
+	this->setBackgroundColor4Float(0.95, 0.95, 0.95, 1.0);
 }
 
-WindowGeneral::WindowGeneral(int *size, int *position, float* backgroundColor4Float)
+WindowGeneral::WindowGeneral(const WindowGeneral &window)
 {
-	this->size = size;
-	this->position = position;
-	this->backgroundColor4Float = backgroundColor4Float;
+	this->title = window.title;
+
+	this->size = new int[2];
+	*this->size = *window.size;
+	*(this->size+1) = *(window.size+1);
+
+	this->position = new int[2];
+	*this->position = *window.position;
+	*(this->position+1) = *(window.position+1);
+
+	this->backgroundColor4Float = new float[4];
+	for (int i = 0; i < 4; i++)
+	{
+		*(this->backgroundColor4Float+i) = *(window.backgroundColor4Float+i);
+	}
 }
 
 WindowGeneral::~WindowGeneral()
 {
-	WindowGeneral::deleteObj();
+	this->deleteObj();
 }
 
 //Screen
 void WindowGeneral::initialize()
 {
 	//Simple buffer
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB );
+	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA );
 	glutInitWindowPosition(this->position[0],this->position[1]);
 	glutInitWindowSize(this->size[0],this->size[1]);
 	glutCreateWindow(this->title);
+	gluOrtho2D(0.0, (GLdouble)this->size[0], 0.0, (GLdouble)this->size[1]);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
 }
 
 void WindowGeneral::drawBackground()
 {
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0.0, (GLdouble)this->size[0], 0.0, (GLdouble)this->size[1]);
-
 	//Background color
 	glClearColor(this->backgroundColor4Float[0],
 				this->backgroundColor4Float[1],
 				this->backgroundColor4Float[2],
 				this->backgroundColor4Float[3]);
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
 //Get and Set
-void WindowGeneral::setSize(int *size)
+void WindowGeneral::setSize(int width, int height)
 {
-	this->size = size;
+	this->size = new int[2];
+	this->size[0] = width;
+	this->size[1] = height;
 }
 
 int* WindowGeneral::getSize()
@@ -88,9 +75,11 @@ int* WindowGeneral::getSize()
 	return this->size;
 }
 
-void WindowGeneral::setPosition(int *position)
+void WindowGeneral::setPosition(int xPosition, int yPosition)
 {
-	this->position = position;
+	this->position = new int[2];
+	this->position[0] = xPosition;
+	this->position[1] = yPosition;
 }
 
 int* WindowGeneral::getPosition()
@@ -108,9 +97,13 @@ char* WindowGeneral::getTitle()
 	return this->title;
 }
 
-void WindowGeneral::setBackgroundColor4Float(float *backgroundColor4Float)
+void WindowGeneral::setBackgroundColor4Float(float R, float G, float B, float alpha)
 {
-	this->backgroundColor4Float = backgroundColor4Float;
+	this->backgroundColor4Float = new float[4];
+	this->backgroundColor4Float[0] = R;
+	this->backgroundColor4Float[1] = G;
+	this->backgroundColor4Float[2] = B;
+	this->backgroundColor4Float[3] = alpha;
 }
 
 float* WindowGeneral::getBackgroundColor4Float()

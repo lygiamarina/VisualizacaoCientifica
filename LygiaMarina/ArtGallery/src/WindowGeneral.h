@@ -9,9 +9,8 @@ private:
 	float *backgroundColor4Float;
 	
 public:
-	WindowGeneral();
-	WindowGeneral(char *title);
-	WindowGeneral(int *size, int *position, float* backgroundColor4Float);
+	WindowGeneral(char *title="Untitled");
+	WindowGeneral(const WindowGeneral &window);
 	~WindowGeneral();
 
 	//Screen
@@ -19,16 +18,16 @@ public:
 	void drawBackground();
 
 	//Get and Set
-	void setSize(int *size);
+	void setSize(int width, int height);
 	int* getSize();
 
-	void setPosition(int *position);
+	void setPosition(int xPosition, int yPosition);
 	int* getPosition();
 
 	void setTitle(char *title);
 	char* getTitle();
 
-	void setBackgroundColor4Float(float *backgroundColor4Float);
+	void setBackgroundColor4Float(float R, float G, float B, float alpha);
 	float* getBackgroundColor4Float();
 
 	//Common methods
