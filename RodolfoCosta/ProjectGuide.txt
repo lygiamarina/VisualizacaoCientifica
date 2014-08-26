@@ -1,0 +1,24 @@
+**Art Gallery problem**
+
+Implementation: C++ and OpenGL (is glut permitted?)
+
+1. Retrieve vertices
+	a) Mouse click
+		-Get mouse position
+		-Turn mouse position into coordinates
+	b) Construct vertices
+		-Store using some structure
+	c) Draw vertices
+	
+2. Draw edges
+	a) Draw as the user clickes
+	b) Does OpenGL permit edge drawing?
+		-Yes: ok
+		-No: draw triangle with angles' value zero
+	c) Draw using previous vertice and new vertice
+	
+3. Triangulation
+	Working on an algorithm
+	
+4. Draw vertices, edges and new edges from triangulation
+	a) How to avoid redrawing?
