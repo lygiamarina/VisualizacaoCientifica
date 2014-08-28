@@ -4,12 +4,44 @@
 		"selected_items":
 		[
 			[
-				"mou",
-				"mousePosition"
+				"vert",
+				"vertices"
+			],
+			[
+				"GLUT",
+				"GLUT_LEFT_BUTTON"
+			],
+			[
+				"curren",
+				"currentVertexId"
+			],
+			[
+				"GL",
+				"GLUT_LEFT_BUTTON"
+			],
+			[
+				"wi",
+				"width"
 			],
 			[
 				"G",
 				"G"
+			],
+			[
+				"w",
+				"width"
+			],
+			[
+				"In",
+				"IntPosition2D"
+			],
+			[
+				"Int",
+				"IntSize2D"
+			],
+			[
+				"mou",
+				"mousePosition"
 			],
 			[
 				"Flo",
@@ -63,7 +95,7 @@
 			"file": "src/main.cpp",
 			"settings":
 			{
-				"buffer_size": 584,
+				"buffer_size": 496,
 				"line_ending": "Unix"
 			}
 		},
@@ -71,7 +103,7 @@
 			"file": "src/DrawHandler.cpp",
 			"settings":
 			{
-				"buffer_size": 1489,
+				"buffer_size": 1759,
 				"line_ending": "Unix",
 				"name": "DrawHandler.cpp"
 			}
@@ -80,7 +112,7 @@
 			"file": "src/WindowGeneral.cpp",
 			"settings":
 			{
-				"buffer_size": 2582,
+				"buffer_size": 2239,
 				"line_ending": "Unix"
 			}
 		},
@@ -88,7 +120,7 @@
 			"file": "src/PolygonVertex.cpp",
 			"settings":
 			{
-				"buffer_size": 1727,
+				"buffer_size": 1762,
 				"line_ending": "Unix"
 			}
 		},
@@ -96,15 +128,7 @@
 			"file": "src/MouseHandler.cpp",
 			"settings":
 			{
-				"buffer_size": 1732,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/WindowGeneral.h",
-			"settings":
-			{
-				"buffer_size": 634,
+				"buffer_size": 1741,
 				"line_ending": "Unix"
 			}
 		},
@@ -112,7 +136,7 @@
 			"file": "src/DrawHandler.h",
 			"settings":
 			{
-				"buffer_size": 575,
+				"buffer_size": 528,
 				"line_ending": "Unix"
 			}
 		},
@@ -120,7 +144,7 @@
 			"file": "src/PolygonVertex.h",
 			"settings":
 			{
-				"buffer_size": 632,
+				"buffer_size": 705,
 				"line_ending": "Unix"
 			}
 		},
@@ -128,7 +152,7 @@
 			"file": "src/MouseHandler.h",
 			"settings":
 			{
-				"buffer_size": 498,
+				"buffer_size": 765,
 				"line_ending": "Unix"
 			}
 		},
@@ -136,15 +160,7 @@
 			"file": "src/Structs.h",
 			"settings":
 			{
-				"buffer_size": 416,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "makefile",
-			"settings":
-			{
-				"buffer_size": 1231,
+				"buffer_size": 472,
 				"line_ending": "Unix"
 			}
 		}
@@ -173,8 +189,9 @@
 	},
 	"file_history":
 	[
-		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/src/MouseHandler.cpp",
+		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/src/WindowGeneral.h",
 		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/makefile",
+		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/src/MouseHandler.cpp",
 		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/src/PolygonVertex.cpp",
 		"/home/lygiamarina/VisualizacaoCientifica/LygiaMarina/ArtGallery/src/PolygonVertex.h"
 	],
@@ -219,15 +236,15 @@
 					"file": "src/main.cpp",
 					"settings":
 					{
-						"buffer_size": 584,
+						"buffer_size": 496,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								552,
-								552
+								353,
+								353
 							]
 						],
 						"settings":
@@ -246,47 +263,20 @@
 					"file": "src/DrawHandler.cpp",
 					"settings":
 					{
-						"buffer_size": 1489,
+						"buffer_size": 1759,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								779,
-								779
+								986,
+								986
 							]
 						],
 						"settings":
 						{
 							"auto_name": "DrawHandler.cpp",
-							"syntax": "Packages/C++/C++.tmLanguage",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 918.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/WindowGeneral.cpp",
-					"settings":
-					{
-						"buffer_size": 2582,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1148,
-								1148
-							]
-						],
-						"settings":
-						{
 							"syntax": "Packages/C++/C++.tmLanguage",
 							"translate_tabs_to_spaces": false
 						},
@@ -297,19 +287,19 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "src/PolygonVertex.cpp",
+					"buffer": 2,
+					"file": "src/WindowGeneral.cpp",
 					"settings":
 					{
-						"buffer_size": 1727,
+						"buffer_size": 2239,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								635,
-								635
+								1095,
+								1095
 							]
 						],
 						"settings":
@@ -318,7 +308,34 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 561.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "src/PolygonVertex.cpp",
+					"settings":
+					{
+						"buffer_size": 1762,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								268,
+								268
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -328,47 +345,15 @@
 					"file": "src/MouseHandler.cpp",
 					"settings":
 					{
-						"buffer_size": 1732,
+						"buffer_size": 1741,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								219,
-								219
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 612.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				}
-			]
-		},
-		{
-			"selected": 4,
-			"sheets":
-			[
-				{
-					"buffer": 5,
-					"file": "src/WindowGeneral.h",
-					"settings":
-					{
-						"buffer_size": 634,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								346,
-								346
+								353,
+								353
 							]
 						],
 						"settings":
@@ -377,25 +362,58 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 51.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
-				},
+				}
+			]
+		},
+		{
+			"selected": 2,
+			"sheets":
+			[
 				{
-					"buffer": 6,
+					"buffer": 5,
 					"file": "src/DrawHandler.h",
 					"settings":
 					{
-						"buffer_size": 575,
+						"buffer_size": 528,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								194,
-								194
+								348,
+								348
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 204.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "src/PolygonVertex.h",
+					"settings":
+					{
+						"buffer_size": 705,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								241,
+								241
 							]
 						],
 						"settings":
@@ -411,18 +429,18 @@
 				},
 				{
 					"buffer": 7,
-					"file": "src/PolygonVertex.h",
+					"file": "src/MouseHandler.h",
 					"settings":
 					{
-						"buffer_size": 632,
+						"buffer_size": 765,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								342,
-								342
+								262,
+								262
 							]
 						],
 						"settings":
@@ -431,85 +449,34 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 51.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
 				},
 				{
 					"buffer": 8,
-					"file": "src/MouseHandler.h",
-					"settings":
-					{
-						"buffer_size": 498,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								294,
-								294
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/C++/C++.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 153.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 9,
 					"file": "src/Structs.h",
 					"settings":
 					{
-						"buffer_size": 416,
+						"buffer_size": 472,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								126,
-								126
+								472,
+								472
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/C++/C++.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 10,
-					"file": "makefile",
-					"settings":
-					{
-						"buffer_size": 1231,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								296,
-								296
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Makefile/Makefile.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 102.0,
+						"translation.y": 119.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
