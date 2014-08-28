@@ -12,10 +12,6 @@ DrawHandler::DrawHandler()
 DrawHandler::~DrawHandler()
 {
 	this->window.deleteObj();
-	for(int i = 0; i < this->vertices.size(); i++)
-	{
-		this->vertices[i].deleteObj();
-	}
 }
 
 void DrawHandler::initialize()
@@ -34,8 +30,8 @@ void DrawHandler::drawOrder()
 	{
 		this->vertices[i].drawVertex();
 		std::cout << "ID: " << this->vertices[i].getId() << std::endl;
-		std::cout << "xPosition: " << this->vertices[i].getPosition()[0] << std::endl;
-		std::cout << "yPosition: " << this->vertices[i].getPosition()[1] << std::endl;
+		std::cout << "xPosition: " << this->vertices[i].getPosition().xPosition << std::endl;
+		std::cout << "yPosition: " << this->vertices[i].getPosition().yPosition << std::endl;
 	}
 
 	std::cout << "" << std::endl;
@@ -54,7 +50,6 @@ void DrawHandler::draw()
 	std::cout << "Desenhando 1" << std::endl;
 	DrawHandler::currentInstance = this;
 	glutDisplayFunc(DrawHandler::drawCallback);
-	glutMainLoop();
 }
 
 //Set and Get

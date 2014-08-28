@@ -11,7 +11,7 @@ OBJS	:= $(patsubst %.$(SRCEXT),$(OBJDIR)/%.o,$(SRCS))
 
 DEBUG	 = -g
 INCLUDES = -I./inc
-CFLAGS	 = -Wall -pedantic -ansi -c $(DEBUG) $(INCLUDES)
+CFLAGS	 = -w -Wall -pedantic -ansi -c $(DEBUG) $(INCLUDES)
 LDFLAGS	 = 
 GLFLAGS	 = -lGL -lGLU -lglut
 

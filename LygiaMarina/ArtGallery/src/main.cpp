@@ -1,4 +1,5 @@
 #include "DrawHandler.h"
+#include "MouseHandler.h"
 #include <GL/glut.h>
 
 int main(int argc, char **argv)
@@ -7,6 +8,7 @@ int main(int argc, char **argv)
 
 	WindowGeneral window("Art Gallery Problem");
 	std::vector<PolygonVertex> vertices;
+	MouseHandler mouseHandler;
 	DrawHandler drawHandler;
 
 	for (int i = 0; i < 5; i++)
@@ -19,5 +21,8 @@ int main(int argc, char **argv)
 	drawHandler.setPolygonVertexVector(vertices);
 	drawHandler.initialize();
 	drawHandler.draw();
+	mouseHandler.handleMouse();
+
+	glutMainLoop();
 	return 0;
 }

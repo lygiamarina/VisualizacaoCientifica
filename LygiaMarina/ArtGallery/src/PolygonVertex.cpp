@@ -19,20 +19,12 @@ PolygonVertex::PolygonVertex(const PolygonVertex &vertex)
 
 	this->size = vertex.size;
 
-	this->position = new float[2];
-	*this->position = *vertex.position;
-	*(this->position+1) = *(vertex.position+1);
+	this->position.xPosition = vertex.position.xPosition;
+	this->position.yPosition = vertex.position.yPosition;
 
-	this->color3Float = new float[3];
-	for (int i = 0; i < 3; i++)
-	{
-		*(this->color3Float+i) = *(vertex.color3Float+i);
-	}
-}
-
-PolygonVertex::~PolygonVertex()
-{
-	this->deleteObj();
+	this->color3Float.R = vertex.color3Float.R;
+	this->color3Float.G = vertex.color3Float.G;
+	this->color3Float.B = vertex.color3Float.B;
 }
 
 //Drawing methods
@@ -46,9 +38,9 @@ void PolygonVertex::initialize()
 void PolygonVertex::drawVertex()
 {
 	glPointSize(this->size);
-	glColor3f(this->color3Float[0], this->color3Float[1], this->color3Float[2]);
+	glColor3f(this->color3Float.R, this->color3Float.G, this->color3Float.B);
 	glBegin(GL_POINTS);
-	glVertex2f(this->position[0], this->position[1]);
+	glVertex2f(this->position.xPosition, this->position.yPosition);
 	glEnd();
 }
 
@@ -75,35 +67,23 @@ float PolygonVertex::getSize()
 
 void PolygonVertex::setPosition(float xPosition, float yPosition)
 {
-	this->position = new float[2];
-	this->position[0] = xPosition;
-	this->position[1] = yPosition;
+	this->position.xPosition = xPosition;
+	this->position.yPosition = yPosition;
 }
 
-float* PolygonVertex::getPosition()
+FloatPosition2D PolygonVertex::getPosition()
 {
 	return this->position;
 }
 
 void PolygonVertex::setColor3Float(float R, float G, float B)
 {
-	this->color3Float = new float[3];
-	this->color3Float[0] = R;
-	this->color3Float[1] = G;
-	this->color3Float[2] = B;
+	this->color3Float.R = R;
+	this->color3Float.G = G;
+	this->color3Float.B = B;
 }
 
-float* PolygonVertex::getColor3Float()
+FloatColor3D PolygonVertex::getColor3Float()
 {
 	return this->color3Float;
-}
-
-//Common methods
-void PolygonVertex::deleteObj()
-{
-	delete [] this->position;
-	this->position = NULL;
-
-	delete [] this->color3Float;
-	this->color3Float = NULL;
 }
