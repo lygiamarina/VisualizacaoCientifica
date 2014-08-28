@@ -35,4 +35,10 @@ typedef struct
 	float alpha;
 } FloatColor4D;
 
+typedef struct
+{
+	int width;
+	int height;
+} IntSize2D;
+
 #endif

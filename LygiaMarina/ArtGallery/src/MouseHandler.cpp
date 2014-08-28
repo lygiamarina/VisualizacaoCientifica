@@ -4,50 +4,29 @@
 
 MouseHandler* MouseHandler::currentInstance = NULL;
 
-MouseHandler::MouseHandler()
+MouseHandler::MouseHandler(std::vector<PolygonVertex> &inVertices, int height) : vertices(inVertices)
 {
 	this->keyName = "";
 	this->command = "";
 	this->lastAction = "";
+	this->windowHeight = height;
 }
 
 void MouseHandler::handle(int button, int state, int x, int y)
 {
 	this->mousePosition.xPosition = x;
-	this->mousePosition.yPosition = y;
+	this->mousePosition.yPosition = this->windowHeight - y;
 
-	if(state == GLUT_DOWN)
+	if(state == GLUT_DOWN && button == GLUT_LEFT_BUTTON)
 	{
 		this->command = "Pressed";
-		
-		if (button == GLUT_LEFT_BUTTON) 
-		{
-			this->keyName = "Left Key";
-		}
-		else if (button == GLUT_MIDDLE_BUTTON) 
-		{
-			this->keyName = "Scroll Key";
-		}
-		else 
-		{
-			this->keyName = "Right Key";
-		}
-	}
-	else
-	{
-		this->command = "Released";
-		if (button == GLUT_LEFT_BUTTON) 
-		{
-			this->keyName = "Left Key";
-		}
-		else if (button == GLUT_MIDDLE_BUTTON) 
-		{
-			this->keyName = "Scroll Key";
-		}
-		else 
-		{
-			this->keyName = "Right Key";
-		}
+		this->keyName = "Left key";
+
+		PolygonVertex localVertex(currentVertexId, this->mousePosition.xPosition, this->mousePosition.yPosition);
+		this->vertices.push_back(localVertex);
+		this->currentVertexId++;
+
+		glutPostRedisplay();
 	}
 
 	this->lastAction = this->keyName;
@@ -71,11 +50,6 @@ void MouseHandler::handleMouse()
 	glutMouseFunc(MouseHandler::handleCallback);
 }
 
-std::string MouseHandler::getLastAction()
-{
-	return this->lastAction;
-}
-
 void MouseHandler::setMousePosition(int xPosition, int yPosition)
 {
 	this->mousePosition.xPosition = xPosition;
@@ -85,4 +59,14 @@ void MouseHandler::setMousePosition(int xPosition, int yPosition)
 IntPosition2D MouseHandler::getMousePosition()
 {
 	return this->mousePosition;
+}
+
+void MouseHandler::setCurrentVertexId(int id)
+{
+	this->currentVertexId = id;
+}
+
+std::string MouseHandler::getLastAction()
+{
+	return this->lastAction;
 }

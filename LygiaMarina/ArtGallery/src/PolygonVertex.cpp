@@ -2,6 +2,9 @@
 #include <GL/glut.h>
 #include <iostream>
 
+PolygonVertex::PolygonVertex()
+{}
+
 PolygonVertex::PolygonVertex(int id, float xPosition, float yPosition, float size)
 {
 	this->id = id;

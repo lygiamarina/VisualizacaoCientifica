@@ -1,3 +1,6 @@
+#ifndef DRAWHANDLER_H
+#define DRAWHANDLER_H
+
 #include "PolygonVertex.h"
 #include "WindowGeneral.h"
 #include <vector>
@@ -9,13 +12,12 @@ private:
 	static DrawHandler* currentInstance;
 
 	WindowGeneral window;
-	std::vector<PolygonVertex> vertices;
+	std::vector<PolygonVertex> &vertices;
 
 	char* windowTitle;
 
 public:
-	DrawHandler();
-	~DrawHandler();
+	DrawHandler(std::vector<PolygonVertex> &inVertices);
 
 	void initialize();
 	void drawOrder();
@@ -25,7 +27,6 @@ public:
 	//Set and Get
 	void setWindow(WindowGeneral &window);
 	WindowGeneral getWindow();
-
-	void setPolygonVertexVector(std::vector<PolygonVertex> vertices);
-	std::vector<PolygonVertex> getPolygonVertexVector();
 };
+
+#endif

@@ -18,24 +18,16 @@ WindowGeneral::WindowGeneral(const WindowGeneral &window)
 {
 	this->title = window.title;
 
-	this->size = new int[2];
-	*this->size = *window.size;
-	*(this->size+1) = *(window.size+1);
+	this->size.width = window.size.width;
+	this->size.height = window.size.height;
 
-	this->position = new int[2];
-	*this->position = *window.position;
-	*(this->position+1) = *(window.position+1);
+	this->position.xPosition = window.position.xPosition;
+	this->position.yPosition = window.position.yPosition;
 
-	this->backgroundColor4Float = new float[4];
-	for (int i = 0; i < 4; i++)
-	{
-		*(this->backgroundColor4Float+i) = *(window.backgroundColor4Float+i);
-	}
-}
-
-WindowGeneral::~WindowGeneral()
-{
-	this->deleteObj();
+	this->backgroundColor4Float.R = window.backgroundColor4Float.R;
+	this->backgroundColor4Float.G = window.backgroundColor4Float.G;
+	this->backgroundColor4Float.B = window.backgroundColor4Float.B;
+	this->backgroundColor4Float.alpha = window.backgroundColor4Float.alpha;
 }
 
 //Screen
@@ -43,21 +35,18 @@ void WindowGeneral::initialize()
 {
 	//Simple buffer
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGBA );
-	glutInitWindowPosition(this->position[0],this->position[1]);
-	glutInitWindowSize(this->size[0],this->size[1]);
+	glutInitWindowPosition(this->position.xPosition,this->position.yPosition);
+	glutInitWindowSize(this->size.width,this->size.height);
 	glutCreateWindow(this->title);
-	gluOrtho2D(0.0, (GLdouble)this->size[0], 0.0, (GLdouble)this->size[1]);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
 }
 
 void WindowGeneral::drawBackground()
 {
 	//Background color
-	glClearColor(this->backgroundColor4Float[0],
-				this->backgroundColor4Float[1],
-				this->backgroundColor4Float[2],
-				this->backgroundColor4Float[3]);
+	glClearColor(this->backgroundColor4Float.R,
+				this->backgroundColor4Float.G,
+				this->backgroundColor4Float.B,
+				this->backgroundColor4Float.alpha);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
@@ -65,24 +54,22 @@ void WindowGeneral::drawBackground()
 //Get and Set
 void WindowGeneral::setSize(int width, int height)
 {
-	this->size = new int[2];
-	this->size[0] = width;
-	this->size[1] = height;
+	this->size.width = width;
+	this->size.height = height;
 }
 
-int* WindowGeneral::getSize()
+IntSize2D WindowGeneral::getSize()
 {
 	return this->size;
 }
 
 void WindowGeneral::setPosition(int xPosition, int yPosition)
 {
-	this->position = new int[2];
-	this->position[0] = xPosition;
-	this->position[1] = yPosition;
+	this->position.xPosition = xPosition;
+	this->position.yPosition = yPosition;
 }
 
-int* WindowGeneral::getPosition()
+IntPosition2D WindowGeneral::getPosition()
 {
 	return this->position;
 }
@@ -99,27 +86,13 @@ char* WindowGeneral::getTitle()
 
 void WindowGeneral::setBackgroundColor4Float(float R, float G, float B, float alpha)
 {
-	this->backgroundColor4Float = new float[4];
-	this->backgroundColor4Float[0] = R;
-	this->backgroundColor4Float[1] = G;
-	this->backgroundColor4Float[2] = B;
-	this->backgroundColor4Float[3] = alpha;
+	this->backgroundColor4Float.R = R;
+	this->backgroundColor4Float.G = G;
+	this->backgroundColor4Float.B = B;
+	this->backgroundColor4Float.alpha = alpha;
 }
 
-float* WindowGeneral::getBackgroundColor4Float()
+FloatColor4D WindowGeneral::getBackgroundColor4Float()
 {
 	return this->backgroundColor4Float;
-}
-
-//Common methods
-void WindowGeneral::deleteObj()
-{
-	delete [] this->size;
-	this->size = NULL;
-
-	delete [] this->position;
-	this->position = NULL;
-
-	delete [] this->backgroundColor4Float;
-	this->backgroundColor4Float = NULL;
 }

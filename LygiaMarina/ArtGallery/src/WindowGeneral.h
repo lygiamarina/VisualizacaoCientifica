@@ -1,17 +1,20 @@
+#ifndef WINDOWGENERAL_H
+#define WINDOWGENERAL_H
+
+#include "Structs.h"
 #include <stdio.h>
 
 class WindowGeneral
 {
 private:
-	int *size;
-	int *position;
+	IntSize2D size;
+	IntPosition2D position;
 	char *title;
-	float *backgroundColor4Float;
+	FloatColor4D backgroundColor4Float;
 	
 public:
 	WindowGeneral(char *title="Untitled");
 	WindowGeneral(const WindowGeneral &window);
-	~WindowGeneral();
 
 	//Screen
 	void initialize();
@@ -19,17 +22,16 @@ public:
 
 	//Get and Set
 	void setSize(int width, int height);
-	int* getSize();
+	IntSize2D getSize();
 
 	void setPosition(int xPosition, int yPosition);
-	int* getPosition();
+	IntPosition2D getPosition();
 
 	void setTitle(char *title);
 	char* getTitle();
 
 	void setBackgroundColor4Float(float R, float G, float B, float alpha);
-	float* getBackgroundColor4Float();
-
-	//Common methods
-	void deleteObj();
+	FloatColor4D getBackgroundColor4Float();
 };
+
+#endif
