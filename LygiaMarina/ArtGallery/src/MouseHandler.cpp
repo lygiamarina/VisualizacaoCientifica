@@ -4,7 +4,7 @@
 
 MouseHandler* MouseHandler::currentInstance = NULL;
 
-MouseHandler::MouseHandler(std::vector<PolygonVertex> &inVertices, int height) : vertices(inVertices)
+MouseHandler::MouseHandler(std::vector<Polygon> &inPolygons, int height) : polygons(inPolygons)
 {
 	this->keyName = "";
 	this->command = "";
@@ -23,8 +23,8 @@ void MouseHandler::handle(int button, int state, int x, int y)
 		this->keyName = "Left key";
 
 		PolygonVertex localVertex(currentVertexId, this->mousePosition.xPosition, this->mousePosition.yPosition);
-		this->vertices.push_back(localVertex);
-		this->currentVertexId++;
+		this->polygons.back().getVertices().push_back(localVertex);
+		this->currentVertexId = this->polygons.back().getVertices().size();
 
 		glutPostRedisplay();
 	}
@@ -34,7 +34,6 @@ void MouseHandler::handle(int button, int state, int x, int y)
 	this->lastAction += this->command;
 	
 	std::cout << this->lastAction << std::endl;	
-	
 	std::cout << "X: " << this->mousePosition.xPosition << std::endl;	
 	std::cout << "Y: " << this->mousePosition.yPosition << std::endl;	
 }

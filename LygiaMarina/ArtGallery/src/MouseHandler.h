@@ -2,7 +2,7 @@
 #define MOUSEHANDLER_H
 
 #include "Structs.h"
-#include "PolygonVertex.h"
+#include "Polygon.h"
 #include <string>
 #include <vector>
 
@@ -11,7 +11,7 @@ class MouseHandler
 private:
 	static MouseHandler* currentInstance;
 
-	std::vector<PolygonVertex> &vertices;
+	std::vector<Polygon> &polygons;
 	int currentVertexId;
 
 	IntPosition2D mousePosition;
@@ -21,7 +21,7 @@ private:
 	int windowHeight;
 
 public:
-	MouseHandler(std::vector<PolygonVertex> &inVertices, int height);
+	MouseHandler(std::vector<Polygon> &inPolygons, int height);
 
 	void handle(int button, int state, int x, int y);
 	static void handleCallback(int button, int state, int x, int y);

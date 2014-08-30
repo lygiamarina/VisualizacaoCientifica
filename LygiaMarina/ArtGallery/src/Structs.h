@@ -41,4 +41,10 @@ typedef struct
 	int height;
 } IntSize2D;
 
+typedef struct
+{
+	FloatPosition2D startVertex;
+	FloatPosition2D endVertex;
+} PolygonDiagonal;
+
 #endif

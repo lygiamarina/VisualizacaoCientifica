@@ -352,8 +352,8 @@
 						"selection":
 						[
 							[
-								353,
-								353
+								66,
+								66
 							]
 						],
 						"settings":
@@ -362,7 +362,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 131.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

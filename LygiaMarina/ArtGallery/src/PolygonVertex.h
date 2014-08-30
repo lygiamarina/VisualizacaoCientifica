@@ -3,7 +3,6 @@
 
 #include "Structs.h"
 #include <stdio.h>
-#include <vector>
 
 class PolygonVertex
 {

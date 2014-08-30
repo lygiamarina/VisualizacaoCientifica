@@ -3,6 +3,7 @@
 
 #include "PolygonVertex.h"
 #include "WindowGeneral.h"
+#include "Polygon.h"
 #include <vector>
 #include <stdio.h>
 
@@ -12,12 +13,12 @@ private:
 	static DrawHandler* currentInstance;
 
 	WindowGeneral window;
-	std::vector<PolygonVertex> &vertices;
+	std::vector<Polygon> &polygons;
 
 	char* windowTitle;
 
 public:
-	DrawHandler(std::vector<PolygonVertex> &inVertices);
+	DrawHandler(std::vector<Polygon> &inPolygons);
 
 	void initialize();
 	void drawOrder();
