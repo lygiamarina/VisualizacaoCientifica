@@ -5,6 +5,8 @@
 
 //Importing our header files
 #include "mouse.h"
+//Importing our cpp files
+#include "polygon.cpp"
 
 using namespace std;
 
@@ -45,6 +47,10 @@ void mouseKeysHandler(int button, int state, int x, int y)
 		if (button == GLUT_LEFT_BUTTON) 
 		{
 			keyName = "Left Key";
+			Vertex* newVertex = new Vertex(x,y);
+			polygon.push_back(newVertex);
+			//cout << polygon.size() << endl;
+			//cout << newVertex.getX() << endl;	
 		}
 		//scroll click
 		else if (button == GLUT_MIDDLE_BUTTON) 
@@ -82,11 +88,10 @@ void mouseKeysHandler(int button, int state, int x, int y)
 	action += " ";
 	action += command;
 	
-	cout << action << endl;	
+	//cout << action << endl;	
 	
 	mouseX = x;
 	mouseY = y;
-	
-	cout << mouseX << endl;	
-	cout << mouseY << endl;	
+	//cout << mouseX << endl;	
+	//cout << mouseY << endl;	
 }
