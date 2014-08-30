@@ -19,8 +19,21 @@ void KeyboardHandler::handle(unsigned char key, int x, int y)
 		this->key = "F";
 
 		this->polygons.back().getVertices().push_back(this->polygons.back().getVertices()[0]);
+		this->polygons.back().setClosedPolygon(true);
 		Polygon newPolygon;
 		this->polygons.push_back(newPolygon);
+
+		glutPostRedisplay();
+	}
+	if(key == 116 || key == 84)
+	{
+		this->command = "Pressed";
+		this->key = "T";
+
+		for(int i = 0; i < this->polygons.size(); i++)
+		{
+			this->polygons[i].triangulate();
+		}
 
 		glutPostRedisplay();
 	}

@@ -29,6 +29,7 @@ void DrawHandler::drawOrder()
 	for(int i = 0; i < this->polygons.size(); i++)
 	{
 		this->polygons[i].drawPolygon();
+		this->polygons[i].drawDiagonals();
 	}
 
 	glFlush();

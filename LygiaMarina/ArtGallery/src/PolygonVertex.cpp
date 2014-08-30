@@ -30,6 +30,28 @@ PolygonVertex::PolygonVertex(const PolygonVertex &vertex)
 	this->color3Float.B = vertex.color3Float.B;
 }
 
+bool PolygonVertex::operator<(const PolygonVertex &vertex)
+const {
+	bool hasMinorY = this->position.yPosition < vertex.position.yPosition;
+	bool hasSameY = this->position.yPosition == vertex.position.yPosition;
+	bool hasMinorX = this->position.xPosition < vertex.position.xPosition;
+	return hasMinorY || (hasSameY && hasMinorX);
+}
+
+bool PolygonVertex::operator==(const PolygonVertex &vertex)
+const {
+	bool hasSameY = this->position.yPosition == vertex.position.yPosition;
+	bool hasSameX = this->position.xPosition == vertex.position.xPosition;
+	return hasSameY && hasSameX;
+}
+
+bool PolygonVertex::operator!=(const PolygonVertex &vertex)
+const {
+	bool hasDifY = this->position.yPosition != vertex.position.yPosition;
+	bool hasDifX = this->position.xPosition != vertex.position.xPosition;
+	return hasDifY && hasDifX;
+}
+
 //Drawing methods
 void PolygonVertex::initialize()
 {

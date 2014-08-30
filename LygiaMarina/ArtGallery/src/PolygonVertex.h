@@ -17,6 +17,10 @@ public:
 	PolygonVertex(int id, float xPosition=0.0, float yPosition=0.0, float size=8.0);
 	PolygonVertex(const PolygonVertex &vertex);
 
+	bool operator<(const PolygonVertex &vertex) const;
+	bool operator==(const PolygonVertex &vertex) const;
+	bool operator!=(const PolygonVertex &vertex) const;
+
 	//Drawing methods
 	void initialize();
 	void drawVertex();

@@ -10,11 +10,13 @@ class Polygon
 private:
 	std::vector<PolygonVertex> vertices;
 	std::vector<PolygonDiagonal> diagonals;
+	bool closedPolygon;
 
 public:
 	Polygon();
 
-	//void triangulate();
+	void triangulate();
+	std::vector<PolygonDiagonal> triangulateByDiagonals(std::vector<PolygonVertex> inVertices);
 	//void paintVertices();
 
 	void initialize();
@@ -23,6 +25,7 @@ public:
 
 	std::vector<PolygonVertex> &getVertices();
 	std::vector<PolygonDiagonal> getDiagonals();
+	void setClosedPolygon(bool state);
 };
 
 #endif
