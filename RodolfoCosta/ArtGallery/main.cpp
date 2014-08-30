@@ -34,13 +34,16 @@ void drawPolygon()
 {
 	for(int i = 0; i < polygon.size(); i++)
     {
-		//cout << (*polygon[i]).getX() << endl;
+		glPointSize(5.0);
+		glBegin(GL_POINTS);
+		glVertex2i((*polygon[i]).getX(), (*polygon[i]).getY());
+		glEnd();
 		
-		if(polygon.size() > 0)
+		if(i > 0)
 		{
-			glPointSize(5.0);
-			glBegin(GL_POINTS);
-			glVertex2i((*polygon[i]).getX(), (*polygon[i]).getY());
+			glBegin(GL_LINES);
+			glVertex2f((*polygon[i-1]).getX(),(*polygon[i-1]).getY());
+			glVertex2f((*polygon[i]).getX(), (*polygon[i]).getY());
 			glEnd();
 		}
 	}
@@ -52,27 +55,11 @@ void renderFunction()
     glClear(GL_COLOR_BUFFER_BIT);
     
     glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
     glLoadIdentity();
     
     glColor3f(1.0, 1.0, 1.0);
     
 	drawPolygon();
-     
-	glColor3f(1.0, 0.0, 0.0);
-	glPushMatrix();
-	glBegin(GL_LINES);
-	glVertex3f(1, 0.0, 0.0);
-	glVertex3f(0, 0, 0);
-	glEnd();
-    //glBegin(GL_POLYGON);
-        //glVertex2f(100, 200);
-        //glVertex2f(100, 400);
-        //glVertex2f(200, 400);
-        //glVertex2f(200, 200);
-    //glEnd();
-    
-    glPopMatrix();
     
     renderText(10, 20, 0.0f, 0.0f, 255.0f);
     
@@ -92,7 +79,7 @@ int main(int argc, char** argv)
    glEnable (GL_BLEND);
    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
    glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-   glLineWidth (2.5);
+   glLineWidth (20);
     
     glutDisplayFunc(renderFunction);
     
