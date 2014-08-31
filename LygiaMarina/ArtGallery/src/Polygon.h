@@ -17,6 +17,7 @@ public:
 
 	void triangulate();
 	std::vector<PolygonDiagonal> triangulateByDiagonals(std::vector<PolygonVertex> inVertices);
+	void setCounterClockwise();
 	//void paintVertices();
 
 	void initialize();
