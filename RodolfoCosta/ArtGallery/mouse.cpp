@@ -14,6 +14,10 @@ string keyName;
 string command;
 string action;
 
+bool leftClicked;
+bool rightClicked;
+bool scrollClicked;
+
 int mouseX;
 int mouseY;
 
@@ -47,20 +51,19 @@ void mouseKeysHandler(int button, int state, int x, int y)
 		if (button == GLUT_LEFT_BUTTON) 
 		{
 			keyName = "Left Key";
-			Vertex* newVertex = new Vertex(x,y);  
-			polygon.push_back(newVertex);
-			//cout << polygon.size() << endl;
-			//cout << newVertex.getX() << endl;	
+			leftClicked = true;	
 		}
 		//scroll click
 		else if (button == GLUT_MIDDLE_BUTTON) 
 		{
 			keyName = "Scroll Key";
+			scrollClicked = true;
 		}
 		//right click
 		else 
 		{
 			keyName = "Right Key";
+			rightClicked = true;
 		}
 	}
 	else
@@ -71,16 +74,19 @@ void mouseKeysHandler(int button, int state, int x, int y)
 		if (button == GLUT_LEFT_BUTTON) 
 		{
 			keyName = "Left Key";
+			leftClicked = false;
 		}
 		//scroll click
 		else if (button == GLUT_MIDDLE_BUTTON) 
 		{
 			keyName = "Scroll Key";
+			scrollClicked = false;
 		}
 		//right click
 		else 
 		{
 			keyName = "Right Key";
+			rightClicked = false;
 		}
 	}
 	

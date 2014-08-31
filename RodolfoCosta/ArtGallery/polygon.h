@@ -8,3 +8,4 @@ public:
 	int getX() { return vertX; }
 	int getY() { return vertY; }
 };
+
