@@ -25,7 +25,7 @@ void KeyboardHandler::handle(unsigned char key, int x, int y)
 
 		glutPostRedisplay();
 	}
-	if(key == 116 || key == 84)
+	else if(key == 116 || key == 84)
 	{
 		this->command = "Pressed";
 		this->key = "T";
@@ -33,6 +33,18 @@ void KeyboardHandler::handle(unsigned char key, int x, int y)
 		for(int i = 0; i < this->polygons.size(); i++)
 		{
 			this->polygons[i].triangulate();
+		}
+
+		glutPostRedisplay();
+	}
+	else if(key == 112 || key == 80)
+	{
+		this->command = "Pressed";
+		this->key = "P";
+
+		for(int i = 0; i < this->polygons.size(); i++)
+		{
+			this->polygons[i].colorVertices();
 		}
 
 		glutPostRedisplay();

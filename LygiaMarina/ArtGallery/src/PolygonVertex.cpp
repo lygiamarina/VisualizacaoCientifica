@@ -14,6 +14,8 @@ PolygonVertex::PolygonVertex(int id, float xPosition, float yPosition, float siz
 	this->setPosition(xPosition, yPosition);
 
 	this->setColor3Float(0.5, 0.0, 0.0);
+
+	this->flagColor = "default";
 }
 
 PolygonVertex::PolygonVertex(const PolygonVertex &vertex)
@@ -28,6 +30,8 @@ PolygonVertex::PolygonVertex(const PolygonVertex &vertex)
 	this->color3Float.R = vertex.color3Float.R;
 	this->color3Float.G = vertex.color3Float.G;
 	this->color3Float.B = vertex.color3Float.B;
+
+	this->flagColor = vertex.flagColor;
 }
 
 bool PolygonVertex::operator<(const PolygonVertex &vertex)
@@ -108,7 +112,24 @@ void PolygonVertex::setColor3Float(float R, float G, float B)
 	this->color3Float.B = B;
 }
 
+void PolygonVertex::setColor3Float(FloatColor3D newColor)
+{
+	this->color3Float.R = newColor.R;
+	this->color3Float.G = newColor.G;
+	this->color3Float.B = newColor.B;
+}
+
 FloatColor3D PolygonVertex::getColor3Float()
 {
 	return this->color3Float;
+}
+
+void PolygonVertex::setFlagColor(std::string newFlag)
+{
+	this->flagColor = newFlag;
+}
+
+std::string PolygonVertex::getFlagColor()
+{
+	return this->flagColor;
 }

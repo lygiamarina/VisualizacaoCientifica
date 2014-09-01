@@ -2,6 +2,7 @@
 #define POLYGON_H
 
 #include "Structs.h"
+#include "VertexStructs.h"
 #include "PolygonVertex.h"
 #include <vector>
 
@@ -10,7 +11,10 @@ class Polygon
 private:
 	std::vector<PolygonVertex> vertices;
 	std::vector<PolygonDiagonal> diagonals;
+	std::vector<PolygonTriangle> triangles; 
 	bool closedPolygon;
+	bool triangulatedPolygon;
+	bool verticesPaintedPolygon;
 
 public:
 	Polygon();
@@ -18,7 +22,8 @@ public:
 	void triangulate();
 	std::vector<PolygonDiagonal> triangulateByDiagonals(std::vector<PolygonVertex> inVertices);
 	void setCounterClockwise();
-	//void paintVertices();
+	void colorVertices();
+	void paintVertices();
 
 	void initialize();
 	void drawPolygon();
@@ -27,6 +32,8 @@ public:
 	std::vector<PolygonVertex> &getVertices();
 	std::vector<PolygonDiagonal> getDiagonals();
 	void setClosedPolygon(bool state);
+	void setTriangulatedPolygon(bool state);
+	void setVerticesPaintedPolygon(bool state);
 };
 
 #endif

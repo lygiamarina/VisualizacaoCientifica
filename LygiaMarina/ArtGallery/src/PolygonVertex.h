@@ -3,6 +3,7 @@
 
 #include "Structs.h"
 #include <stdio.h>
+#include <string>
 
 class PolygonVertex
 {
@@ -11,6 +12,7 @@ private:
 	float size;
 	FloatPosition2D position;
 	FloatColor3D color3Float;
+	std::string flagColor;
 
 public:
 	PolygonVertex();
@@ -36,7 +38,11 @@ public:
 	FloatPosition2D getPosition();
 
 	void setColor3Float(float R, float G, float B);
+	void setColor3Float(FloatColor3D newColor);
 	FloatColor3D getColor3Float();
+
+	void setFlagColor(std::string newFlag);
+	std::string getFlagColor();
 };
 
 #endif
