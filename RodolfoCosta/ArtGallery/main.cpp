@@ -6,7 +6,11 @@
 //Importing our cpp files
 #include "mouse.cpp"
 
+#include "text.cpp"
+
 using namespace std;
+
+Text *oie = new Text("oie");
 
 void renderText(int x, int y, float r, float g, float b, string text)
 {
@@ -23,7 +27,7 @@ void renderText(int x, int y, float r, float g, float b, string text)
     glLoadIdentity();
     
 	glRasterPos2i(x, y);
-	glColor3f(r, g, b);
+	//glColor3f(r, g, b);
 	for(int i = 0; i < text.length(); i++)
 	{
 		glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, text[i]);
@@ -118,7 +122,7 @@ void drawPolygon()
 		canAddVertex = true;
 		scrollClicked = false;
 	}
-	cout << canAddVertex << endl;
+	//cout << canAddVertex << endl;
 }
 
 void renderFunction()
@@ -133,29 +137,32 @@ void renderFunction()
     
 	drawPolygon();
     
-    glBegin(GL_LINES);
-    //horizontal red line
-    glColor3f(1.0, 0, 0);
-	glVertex2f(100,300);
-	glVertex2f(200, 300);
-	//vertical green line
-	glColor3f(0, 1.0, 0);
-	glVertex2f(150,200);
-	glVertex2f(150, 400);
-	glEnd();
+    //glBegin(GL_LINES);
+    ////horizontal red line
+    //glColor3f(1.0, 0, 0);
+	//glVertex2f(100,300);
+	//glVertex2f(200, 300);
+	////vertical green line
+	//glColor3f(0, 1.0, 0);
+	//glVertex2f(150,200);
+	//glVertex2f(150, 400);
+	//glEnd();
 	
-	glBegin(GL_LINES);
-    //horizontal blue line
-    glColor3f(0, 0, 1);
-	glVertex2f(100,440);
-	glVertex2f(200, 440);
-	//horizontal white line
-	glColor3f(1, 1.0, 1);
-	glVertex2f(100,470);
-	glVertex2f(300,470);
-	glEnd();
+	//glBegin(GL_LINES);
+    ////horizontal blue line
+    //glColor3f(0, 0, 1);
+	//glVertex2f(100,440);
+	//glVertex2f(200, 440);
+	////horizontal white line
+	//glColor3f(1, 1.0, 1);
+	//glVertex2f(100,470);
+	//glVertex2f(300,470);
+	//glEnd();
+    
+    //oie->draw();
     
     renderText(10, 30, 0.0f, 0.0f, 255.0f, getAction());
+    
     
     glutPostRedisplay();
     glFlush();
@@ -174,6 +181,9 @@ int main(int argc, char** argv)
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glHint (GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
     glLineWidth (20);
+    
+    oie->setPosition(100,300);
+	oie->setColor(255.0f,0.0f,0.0f);
     
     glutDisplayFunc(renderFunction);
     

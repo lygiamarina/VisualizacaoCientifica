@@ -10,6 +10,59 @@
 
 using namespace std;
 
+
+Mouse::Mouse()
+{
+	cout << "Mouse created!" << endl;
+}
+
+void Mouse::mouseClickHandler(int button, int state, int x, int y)
+{
+	//This is detected when we press a button
+	if(state == GLUT_DOWN)
+	{		
+		//Left click
+		if (button == GLUT_LEFT_BUTTON) 
+		{
+			leftClicked = true;	
+		}
+		//scroll click
+		else if (button == GLUT_MIDDLE_BUTTON) 
+		{
+			scrollClicked = true;
+		}
+		//right click
+		else 
+		{
+			rightClicked = true;
+		}
+	}
+	else
+	{		
+		//Left click
+		if (button == GLUT_LEFT_BUTTON) 
+		{
+			leftClicked = false;
+		}
+		//scroll click
+		else if (button == GLUT_MIDDLE_BUTTON) 
+		{
+			scrollClicked = false;
+		}
+		//right click
+		else 
+		{
+			rightClicked = false;
+		}
+	}
+}
+
+
+
+
+
+
+
 string keyName;
 string command;
 string action;

@@ -1,0 +1,35 @@
+.SUFFIXES: .C .cpp .cxx .h
+
+include $(CGAL_MAKEFILE)
+
+# flags for C++ compiler:
+
+CFLAGS 		= 	-frounding-math 
+
+# libraries to link with:
+
+LIBPATH 	= 	
+
+LDFLAGS 	= 	-lCGAL 
+
+CXX             =       i686-pc-mingw32-g++
+
+# ***********************************************************************************
+all:	terrain
+
+terrain:	terrain.o
+	$(CXX)  -o $@.exe $^ $(CFLAGS) $(LIBPATH) $(LDFLAGS) -lglut -lglu32 -lopengl32
+
+.c.o:	$*.h
+	$(CXX) -c $(CFLAGS) $*.c
+
+.cpp.o:	$*.h
+	$(CXX) -c $(CFLAGS) $*.cpp
+
+clean:
+	rm *.o terrain
+
+.C.o:	$*.h
+	$(CXX) -c $(CFLAGS) $*.C
+
+
