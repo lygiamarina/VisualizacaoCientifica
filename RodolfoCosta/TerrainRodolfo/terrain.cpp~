@@ -190,9 +190,9 @@ void mousePassiveMotionHandler (int x, int y)
     mouseY = y;
 }
 
-//THIS CODE DOESNT WORK BECAUSE IT GIVES GLDouble DOES NOT NAME A TYPE
-//GLDouble m_startX, m_startY, m_startZ, m_endX, m_endY, m_endZ;
-/* void createMouseRay()
+
+GLDouble m_startX, m_startY, m_startZ, m_endX, m_endY, m_endZ;
+void createMouseRay()
 {
     double matModelView[16], matProjection[16]; 
     int viewport[4]; 
@@ -215,7 +215,7 @@ void mousePassiveMotionHandler (int x, int y)
          viewport, &m_endX, &m_endY, &m_endZ); 
 
     // now you can create a ray from m_start to m_end
-} */
+}
 
 
 
