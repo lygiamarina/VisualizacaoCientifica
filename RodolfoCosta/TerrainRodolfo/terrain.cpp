@@ -110,7 +110,7 @@ PlaneSet planes; // Planes for which intersection curves are computed
 PolylineSet curves; // Intersection curves
 
 Point center;  // Center of dt´s minimum enclosing parallelepiped
-int width = 400, height = 300;  // Window size
+int width = 800, height = 600;  // Window size
 int activebutton;  // Which mouse button was pressed
 int xmouse, ymouse;  // Coords where mouse was pressed
 double xangle = 0.0, yangle = 0.0; // Angles for viewing terrain
@@ -153,49 +153,15 @@ void display ()
 
 void reshape (int wid, int hgt)
 {
-    glViewport(0,0,width=wid,height=hgt);
+    glViewport(0,0, wid, hgt);
 }
 
-void mouseClickHandler (int button, int state, int x, int y)
+ void createMouseRay(int mouseX, int mouseY)
 {
-    xmouse = x;
-    ymouse = y;
-    if (button == GLUT_LEFT_BUTTON) {
-        if (state == GLUT_UP) {
-            glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
-            xangle = 0; yangle = 0;
-        }
-    }
-    activebutton = button;
-    glutPostRedisplay ();
-}
-
-//This function only detects the mouse movement while we are clicking a button
-void mouseActiveMotionHandler (int x, int y)
-{
-    if (activebutton == GLUT_RIGHT_BUTTON) 
-    {
-        yangle = (x - xmouse) * 360 / width;
-        xangle = (y - ymouse) * 180 / height;
-    }
-    glutPostRedisplay ();
-}
-
-//This function detects the mouse movement while the mouse is on this window
-int mouseX, mouseY;
-void mousePassiveMotionHandler (int x, int y)
-{
-    //cout << "mouse moving" << endl;
-    mouseX = x;
-    mouseY = y;
-}
-
-//THIS CODE DOESNT WORK BECAUSE IT GIVES GLDouble DOES NOT NAME A TYPE
-//GLDouble m_startX, m_startY, m_startZ, m_endX, m_endY, m_endZ;
-/* void createMouseRay()
-{
-    double matModelView[16], matProjection[16]; 
-    int viewport[4]; 
+    GLdouble matModelView[16], matProjection[16]; 
+    GLint viewport[4]; 
+	GLdouble m_startX, m_startY, m_startZ;
+	GLdouble m_endX, m_endY, m_endZ;
 
     // get matrix and viewport:
     glGetDoublev( GL_MODELVIEW_MATRIX, matModelView ); 
@@ -215,7 +181,49 @@ void mousePassiveMotionHandler (int x, int y)
          viewport, &m_endX, &m_endY, &m_endZ); 
 
     // now you can create a ray from m_start to m_end
-} */
+	cout << "start position: " << endl;
+	cout << m_startX << endl; 
+	cout << m_startY << endl; 
+	cout << m_startZ << endl; 
+	cout << "end position" << endl;
+	cout << m_endX << endl; 
+	cout << m_endY << endl; 
+	cout << m_endZ << endl; 
+} 
+
+
+
+void mouseClickHandler (int button, int state, int x, int y)
+{
+    xmouse = x;
+    ymouse = y;
+    if (button == GLUT_LEFT_BUTTON) {
+        if (state == GLUT_UP) {
+            glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
+            xangle = 0; yangle = 0;
+        }
+    }
+    activebutton = button;  //saves the camera rotation
+    glutPostRedisplay ();
+}
+
+//This function only detects the mouse movement while we are clicking a button
+void mouseActiveMotionHandler (int x, int y)
+{
+    if (activebutton == GLUT_RIGHT_BUTTON) 
+    {
+        yangle = (x - xmouse) * 360 / width;
+        xangle = (y - ymouse) * 180 / height;
+    }
+    glutPostRedisplay ();
+}
+
+//This function detects the mouse movement while the mouse is on this window
+void mousePassiveMotionHandler (int x, int y)
+{
+    //cout << "mouse moving" << endl;
+	createMouseRay(x, y);
+}
 
 
 
