@@ -1,6 +1,8 @@
 #include <CGAL/Cartesian.h>
 #include <CGAL/Projection_traits_xy_3.h>
 #include <CGAL/Delaunay_triangulation_2.h>
+#include <CGAL/Segment_3.h>
+#include <CGAL/Point_3.h>
 #include <GL/glut.h>
 #include "GL/gl.h"
 #include <fstream>
@@ -20,6 +22,7 @@ typedef Repr::Plane_3 Plane;  // A Plane in 3D
 typedef std::list<Point> myPolyline; // A polygonal line
 typedef std::list<myPolyline> PolylineSet; // A set of polylines
 typedef std::list<Plane> PlaneSet; // A set of planes
+typedef Repr::Segment_3 Segment;
 
 /**
  * Computes the minimum enclosing parallelepiped of a
@@ -116,6 +119,10 @@ int xmouse, ymouse;  // Coords where mouse was pressed
 double xangle = 0.0, yangle = 0.0; // Angles for viewing terrain
 double modelview [16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}; // Current modelview matrix
 
+Point segmentPointStart;
+Point segmentPointEnd;
+Segment segmentPick;
+
 void init ()
 {
     // Create an orthogonal projection system for viewing
@@ -148,6 +155,11 @@ void display ()
     glMultMatrixd (modelview);
        draw (dt);
        draw (curves);
+	glColor3f(1.0f, 0.0f, 0.0f);
+	glBegin(GL_LINE_STRIP);
+		glVertex3f(segmentPick.source()[0], segmentPick.source()[1], segmentPick.source()[2]);
+		glVertex3f(segmentPick.target()[0], segmentPick.target()[1], segmentPick.target()[2]);
+	glEnd();	
     glutSwapBuffers();
 }
 
@@ -179,6 +191,11 @@ void reshape (int wid, int hgt)
     // get point on the 'far' plane (third param is set to 1.0)
     gluUnProject(winX, winY, 1.0, matModelView, matProjection, 
          viewport, &m_endX, &m_endY, &m_endZ); 
+		 
+	
+	segmentPointStart = Point(m_startX, m_startY, m_startZ);
+	segmentPointEnd = Point(m_endX, m_endY, m_endZ);
+	segmentPick = Segment(segmentPointStart, segmentPointEnd);
 
     // now you can create a ray from m_start to m_end
 	cout << "start position: " << endl;
@@ -198,6 +215,7 @@ void mouseClickHandler (int button, int state, int x, int y)
     xmouse = x;
     ymouse = y;
     if (button == GLUT_LEFT_BUTTON) {
+		createMouseRay(x, y);
         if (state == GLUT_UP) {
             glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
             xangle = 0; yangle = 0;
@@ -222,7 +240,6 @@ void mouseActiveMotionHandler (int x, int y)
 void mousePassiveMotionHandler (int x, int y)
 {
     //cout << "mouse moving" << endl;
-	createMouseRay(x, y);
 }
 
 
