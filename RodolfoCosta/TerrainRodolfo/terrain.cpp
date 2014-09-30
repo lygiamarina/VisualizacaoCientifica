@@ -3,12 +3,15 @@
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Segment_3.h>
 #include <CGAL/Point_3.h>
+#include <CGAL/intersections.h>
+
 #include <GL/glut.h>
 #include "GL/gl.h"
 #include <fstream>
 #include <iostream>
 #include <assert.h>
 #include <math.h>
+#include <vector>
 
 using namespace std;
 
@@ -21,7 +24,7 @@ typedef Repr::Vector_3 Vector;  // A Vector in 3D
 typedef Repr::Plane_3 Plane;  // A Plane in 3D
 typedef std::list<Point> myPolyline; // A polygonal line
 typedef std::list<myPolyline> PolylineSet; // A set of polylines
-typedef std::list<Plane> PlaneSet; // A set of planes
+typedef std::vector<Plane> PlaneSet; // A set of planes
 typedef Repr::Segment_3 Segment;
 
 /**
@@ -48,6 +51,34 @@ void limits (Delaunay& triang, Point& min, Point& max)
     }
     min = Point (mincoord [0], mincoord [1], mincoord [2]);
     max = Point (maxcoord [0], maxcoord [1], maxcoord [2]);
+}
+
+void checkIntersection(Plane plane, Segment seg)
+{
+    CGAL::Object result;
+    Point ipoint;
+    Segment iseg;
+
+    result = CGAL::intersection(plane, seg);
+	
+    if (CGAL::assign(ipoint, result)) 
+	{
+        // handle the point intersection case.
+		cout << "colisao deu um ponto" << endl;
+    } 
+	else
+	{
+        if (CGAL::assign(iseg, result)) 
+		{
+            // handle the segment intersection case.
+			cout << "colisao deu um segmento" << endl;
+        } 
+		else 
+		{
+            // handle the no intersection case.
+			cout << "nao houve colisao" << endl;
+        }
+	}
 }
 
 /**
@@ -198,14 +229,14 @@ void reshape (int wid, int hgt)
 	segmentPick = Segment(segmentPointStart, segmentPointEnd);
 
     // now you can create a ray from m_start to m_end
-	cout << "start position: " << endl;
-	cout << m_startX << endl; 
-	cout << m_startY << endl; 
-	cout << m_startZ << endl; 
-	cout << "end position" << endl;
-	cout << m_endX << endl; 
-	cout << m_endY << endl; 
-	cout << m_endZ << endl; 
+	//cout << "start position: " << endl;
+	//cout << m_startX << endl; 
+	//cout << m_startY << endl; 
+	//cout << m_startZ << endl; 
+	//cout << "end position" << endl;
+	//cout << m_endX << endl; 
+	//cout << m_endY << endl; 
+	//cout << m_endZ << endl; 
 } 
 
 
@@ -214,8 +245,16 @@ void mouseClickHandler (int button, int state, int x, int y)
 {
     xmouse = x;
     ymouse = y;
-    if (button == GLUT_LEFT_BUTTON) {
-		createMouseRay(x, y);
+    if (button == GLUT_LEFT_BUTTON) 
+	{
+		if(state == GLUT_DOWN)
+		{
+			createMouseRay(x, y);
+			for(int i = 0; i < planes.size(); i++)
+			{
+				checkIntersection(planes[i], segmentPick);
+			}
+		}
         if (state == GLUT_UP) {
             glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
             xangle = 0; yangle = 0;
