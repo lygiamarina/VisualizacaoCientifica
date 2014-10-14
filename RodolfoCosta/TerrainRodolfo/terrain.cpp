@@ -22,10 +22,13 @@ typedef CGAL::Delaunay_triangulation_2<Gt> Delaunay; // A Delaunay triangulation
 typedef Repr::Point_3 Point;  // A Point in 3D
 typedef Repr::Vector_3 Vector;  // A Vector in 3D
 typedef Repr::Plane_3 Plane;  // A Plane in 3D
+typedef Repr::Triangle_3 Triangle;
 typedef std::list<Point> myPolyline; // A polygonal line
 typedef std::list<myPolyline> PolylineSet; // A set of polylines
 typedef std::vector<Plane> PlaneSet; // A set of planes
 typedef Repr::Segment_3 Segment;
+typedef std::vector<Triangle> TriangleList; // A set of triangle
+typedef std::vector<CGAL::Object> ObjectList; // A set of Object
 
 /**
  * Computes the minimum enclosing parallelepiped of a
@@ -53,32 +56,25 @@ void limits (Delaunay& triang, Point& min, Point& max)
     max = Point (maxcoord [0], maxcoord [1], maxcoord [2]);
 }
 
-void checkIntersection(Plane plane, Segment seg)
+CGAL::Object checkIntersection(Triangle triangle, Segment seg)
 {
     CGAL::Object result;
     Point ipoint;
     Segment iseg;
+    result = CGAL::intersection(triangle, seg);	
+	return result;
+}
 
-    result = CGAL::intersection(plane, seg);
+float euclideanDistance(float x1, float y1, float z1, float x2, float y2, float z2)
+{
+	float distanceX, distanceY, distanceZ, distance;
+	distanceX = x2-x1;
+	distanceY = y2-y1;
+	distanceZ = z2-z1;
 	
-    if (CGAL::assign(ipoint, result)) 
-	{
-        // handle the point intersection case.
-		cout << "colisao deu um ponto" << endl;
-    } 
-	else
-	{
-        if (CGAL::assign(iseg, result)) 
-		{
-            // handle the segment intersection case.
-			cout << "colisao deu um segmento" << endl;
-        } 
-		else 
-		{
-            // handle the no intersection case.
-			cout << "nao houve colisao" << endl;
-        }
-	}
+	distance = sqrt(distanceX*distanceX + distanceY*distanceY + distanceZ*distanceZ);
+	
+	return distance;
 }
 
 /**
@@ -154,6 +150,11 @@ Point segmentPointStart;
 Point segmentPointEnd;
 Segment segmentPick;
 
+TriangleList intersectFaces;
+ObjectList intersectionResult; 
+Triangle t;
+std::vector<float> euclideanDistances;
+
 void init ()
 {
     // Create an orthogonal projection system for viewing
@@ -186,11 +187,23 @@ void display ()
     glMultMatrixd (modelview);
        draw (dt);
        draw (curves);
-	glColor3f(1.0f, 0.0f, 0.0f);
+	//glColor3f(1.0f, 0.0f, 0.0f);
 	glBegin(GL_LINE_STRIP);
+		glColor3f(1.0f, 0.0f, 0.0f);
 		glVertex3f(segmentPick.source()[0], segmentPick.source()[1], segmentPick.source()[2]);
+		glColor3f(0.0f, 0.0f, 1.0f);
 		glVertex3f(segmentPick.target()[0], segmentPick.target()[1], segmentPick.target()[2]);
 	glEnd();	
+	
+	glColor3f (0.0, 1.0, 0.0);  // green
+    glBegin(GL_TRIANGLES);
+    for (int i = 0; i < 3; i++) {
+        Point p = (t.vertex (i));
+        glVertex3f (p[0], p[1], p[2]);
+    }
+
+    glEnd ();
+	
     glutSwapBuffers();
 }
 
@@ -199,7 +212,7 @@ void reshape (int wid, int hgt)
     glViewport(0,0, wid, hgt);
 }
 
- void createMouseRay(int mouseX, int mouseY)
+void createMouseRay(int mouseX, int mouseY)
 {
     GLdouble matModelView[16], matProjection[16]; 
     GLint viewport[4]; 
@@ -239,6 +252,72 @@ void reshape (int wid, int hgt)
 	//cout << m_endZ << endl; 
 } 
 
+void findTriagleIntersected(Delaunay dt, Segment seg){
+
+    CGAL::Object result;
+    intersectFaces.clear();
+    intersectionResult.clear();
+    Delaunay::Finite_faces_iterator it;
+
+    for (it = dt.finite_faces_begin (); it != dt.finite_faces_end (); ++it) 
+    {   
+        Delaunay::Face f = *it;
+        Triangle triangleFace((*(f.vertex(0))).point(), (*(f.vertex(1))).point(), (*(f.vertex(2))).point());
+
+        if(CGAL::do_intersect(triangleFace, seg)){;
+            intersectFaces.push_back(triangleFace);
+            result = checkIntersection(triangleFace, seg);
+            intersectionResult.push_back(result);
+        }
+    }
+}
+
+Triangle firstTriangle()
+{
+    CGAL::Object obj;
+    Point rPoint;
+    Segment rSeg;
+    double coordZ = 2.0f;
+    int index = 0;
+    
+    float ed;
+    float minimumED;
+    
+    euclideanDistances.clear();
+
+    for (int i = 0; i<intersectionResult.size(); i++)
+    {
+        obj = intersectionResult[i];
+
+        if(CGAL::assign(rPoint, obj)){
+            //cout<<rPoint[0]<<", "<<rPoint[1]<<", "<<rPoint[2]<<endl;; 
+
+			ed = euclideanDistance(segmentPointStart.x(), segmentPointStart.y(), segmentPointStart.z(), rPoint[0], rPoint[1], rPoint[2]);
+			euclideanDistances.push_back(ed);
+        }
+
+        if(CGAL::assign(rSeg, obj)){
+            //cout<<rSeg.source()[0]<<", "<<rSeg.source()[1]<<", "<<rSeg.source()[2];
+            //cout<<rSeg.target()[0]<<", "<<rSeg.target()[1]<<", "<<rSeg.target()[2];
+			
+            ed = euclideanDistance(segmentPick.source()[0], segmentPick.source()[1], segmentPick.source()[2], rSeg.source()[0], rSeg.source()[1], rSeg.source()[2]);
+			euclideanDistances.push_back(ed);
+        }
+    }
+    
+    minimumED = euclideanDistances[0];
+    for (int i = 0; i<euclideanDistances.size(); i++)
+    {
+		cout << euclideanDistances[i] << endl;
+		if(euclideanDistances[i] < minimumED)
+		{
+			minimumED = euclideanDistances[i];
+			index = i;
+		}
+	}
+	cout << "Triangulo escolhido: " << euclideanDistances[index] << endl;
+    return intersectFaces[index];
+}
 
 
 void mouseClickHandler (int button, int state, int x, int y)
@@ -250,10 +329,8 @@ void mouseClickHandler (int button, int state, int x, int y)
 		if(state == GLUT_DOWN)
 		{
 			createMouseRay(x, y);
-			for(int i = 0; i < planes.size(); i++)
-			{
-				checkIntersection(planes[i], segmentPick);
-			}
+			findTriagleIntersected(dt, segmentPick);
+			t = firstTriangle();
 		}
         if (state == GLUT_UP) {
             glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
