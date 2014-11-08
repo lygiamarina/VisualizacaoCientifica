@@ -43,6 +43,7 @@ terrain$(EXT):	terrain.o
 
 clean:
 	rm *.o terrain$(EXT)
+	rm *~
 
 .C.o:	$*.h
 	$(CXX) -c $(CFLAGS) $*.C
