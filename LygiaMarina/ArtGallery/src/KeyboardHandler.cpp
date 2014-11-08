@@ -13,19 +13,22 @@ KeyboardHandler::KeyboardHandler(std::vector<Polygon> &inPolygons) : polygons(in
 
 void KeyboardHandler::handle(unsigned char key, int x, int y)
 {
-	if(key == 102 || key == 70)
+	if(key == 'f' || key == 'F')
 	{
 		this->command = "Pressed";
 		this->key = "F";
 
-		this->polygons.back().getVertices().push_back(this->polygons.back().getVertices()[0]);
-		this->polygons.back().setClosedPolygon(true);
-		Polygon newPolygon;
-		this->polygons.push_back(newPolygon);
+		if(this->polygons.back().getVertices().size())
+		{
+			this->polygons.back().getVertices().push_back(this->polygons.back().getVertices()[0]);
+			this->polygons.back().setClosedPolygon(true);
+			Polygon newPolygon;
+			this->polygons.push_back(newPolygon);
 
-		glutPostRedisplay();
+			glutPostRedisplay();
+		}
 	}
-	else if(key == 116 || key == 84)
+	else if(key == 't' || key == 'T')
 	{
 		this->command = "Pressed";
 		this->key = "T";
@@ -37,7 +40,7 @@ void KeyboardHandler::handle(unsigned char key, int x, int y)
 
 		glutPostRedisplay();
 	}
-	else if(key == 112 || key == 80)
+	else if(key == 'p' || key == 'P')
 	{
 		this->command = "Pressed";
 		this->key = "P";
@@ -46,6 +49,19 @@ void KeyboardHandler::handle(unsigned char key, int x, int y)
 		{
 			this->polygons[i].colorVertices();
 		}
+
+		glutPostRedisplay();
+	}
+	else if(key == 'c' || key == 'C')
+	{
+		this->command = "Pressed";
+		this->key = "C";
+
+		this->polygons.clear();
+
+		Polygon newPolygon;
+
+		this->polygons.push_back(newPolygon);
 
 		glutPostRedisplay();
 	}

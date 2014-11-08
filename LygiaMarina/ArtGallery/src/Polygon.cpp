@@ -14,18 +14,18 @@ Polygon::Polygon()
 
 void Polygon::triangulate()
 {
-	if (this->closedPolygon && !this->triangulatedPolygon)
+	if (this->closedPolygon && !this->triangulatedPolygon && this->vertices.size() > 4)
 	{
 		this->setCounterClockwise();
 		std::vector<PolygonVertex> inVertices(this->vertices);
 		inVertices.erase(inVertices.end());
-		this->diagonals = this->triangulateByDiagonals(inVertices);
+		this->triangles = this->triangulateByDiagonals(inVertices);
 		this->triangulatedPolygon = true;
 		std::cout << "Triangles: " << this->triangles.size() << std::endl;
 	}
 }
 
-std::vector<PolygonDiagonal> Polygon::triangulateByDiagonals(std::vector<PolygonVertex> inVertices)
+std::deque<PolygonTriangle> Polygon::triangulateByDiagonals(std::vector<PolygonVertex> inVertices)
 {
 	std::cout << "Begin of Triangulate" << std::endl;
 
@@ -33,7 +33,7 @@ std::vector<PolygonDiagonal> Polygon::triangulateByDiagonals(std::vector<Polygon
 	std::vector<PolygonVertex> orderedXVertices(inVertices);
 	std::sort(orderedXVertices.begin(), orderedXVertices.end());
 
-	std::vector<PolygonDiagonal> diagonals;
+	std::deque<PolygonTriangle> triangles;
 
 	PolygonVertex currentVertex = orderedXVertices.front();
 
@@ -82,7 +82,7 @@ std::vector<PolygonDiagonal> Polygon::triangulateByDiagonals(std::vector<Polygon
 
 			probDiagonal.startVertex = currentVertex;
 			probDiagonal.endVertex = orderedXVertices[i];
-			diagonals.push_back(probDiagonal);
+			this->diagonals.push_back(probDiagonal);
 
 			it = std::find(vertices.begin(), vertices.end(), orderedXVertices[i]);
 			posInVector = std::distance(vertices.begin(), it);
@@ -95,8 +95,8 @@ std::vector<PolygonDiagonal> Polygon::triangulateByDiagonals(std::vector<Polygon
 
 			if (rightVertices.size() > 3)
 			{
-				std::vector<PolygonDiagonal> second = this->triangulateByDiagonals(rightVertices);
-				diagonals.insert(diagonals.end(), second.begin(), second.end());
+				std::deque<PolygonTriangle> second = this->triangulateByDiagonals(rightVertices);
+				triangles.insert(triangles.begin(), second.begin(), second.end());
 			}
 			else
 			{
@@ -104,13 +104,13 @@ std::vector<PolygonDiagonal> Polygon::triangulateByDiagonals(std::vector<Polygon
 				newTriangle.vertexA = rightVertices[0];
 				newTriangle.vertexB = rightVertices[1];
 				newTriangle.vertexC = rightVertices[2];
-				this->triangles.push_back(newTriangle);
+				triangles.push_front(newTriangle);
 			}
 
 			if (leftVertices.size() > 3)
 			{
-				std::vector<PolygonDiagonal> first = this->triangulateByDiagonals(leftVertices);
-				diagonals.insert(diagonals.end(), first.begin(), first.end());
+				std::deque<PolygonTriangle> first = this->triangulateByDiagonals(leftVertices);
+				triangles.insert(triangles.end(), first.begin(), first.end());
 			}
 			else
 			{
@@ -118,15 +118,15 @@ std::vector<PolygonDiagonal> Polygon::triangulateByDiagonals(std::vector<Polygon
 				newTriangle.vertexA = leftVertices[0];
 				newTriangle.vertexB = leftVertices[1];
 				newTriangle.vertexC = leftVertices[2];
-				this->triangles.push_back(newTriangle);
+				triangles.push_back(newTriangle);
 			}
 			
-			return diagonals;
+			return triangles;
 		}
 	}
 
 	std::cout << "Proper diagonal" << std::endl;
-	diagonals.push_back(probDiagonal);
+	this->diagonals.push_back(probDiagonal);
 
 	std::cout << "Erase currentVertex" << std::endl;
 	it = std::find(vertices.begin(), vertices.end(), currentVertex);
@@ -146,12 +146,12 @@ std::vector<PolygonDiagonal> Polygon::triangulateByDiagonals(std::vector<Polygon
 
 	newTriangle.vertexC = vertices[posInVector];
 
-	this->triangles.push_back(newTriangle);
+	triangles.push_back(newTriangle);
 
 	if (vertices.size() > 3)
 	{
-		std::vector<PolygonDiagonal> resultPolygon = this->triangulateByDiagonals(vertices);
-		diagonals.insert(diagonals.end(), resultPolygon.begin(), resultPolygon.end());
+		std::deque<PolygonTriangle> resultPolygon = this->triangulateByDiagonals(vertices);
+		triangles.insert(triangles.end(), resultPolygon.begin(), resultPolygon.end());
 	}
 	else
 	{
@@ -159,10 +159,10 @@ std::vector<PolygonDiagonal> Polygon::triangulateByDiagonals(std::vector<Polygon
 		newTriangle.vertexA = vertices[0];
 		newTriangle.vertexB = vertices[1];
 		newTriangle.vertexC = vertices[2];
-		this->triangles.push_back(newTriangle);
+		triangles.push_back(newTriangle);
 	}
 
-	return diagonals;
+	return triangles;
 }
 
 void Polygon::setCounterClockwise()
@@ -196,6 +196,10 @@ void Polygon::paintVertices()
 	int posInVector;
 
 	FloatColor3D colorToPaint;
+	colorToPaint.R = 0.0;
+	colorToPaint.G = 0.0;
+	colorToPaint.B = 0.0;
+
 	std::string flagColor;
 
 	FloatColor3D green;
@@ -215,25 +219,25 @@ void Polygon::paintVertices()
 		
 	std::cout << "Coloring initial vertices" << std::endl;	
 
-	it = std::find(this->vertices.begin(), this->vertices.end()-1, this->triangles[0].vertexA);
+	it = std::find(this->vertices.begin(), this->vertices.end(), this->triangles.back().vertexA);
 	posInVector = std::distance(this->vertices.begin(), it);
 
 	std::cout << "Coloring VertexA" << std::endl;
 	this->vertices[posInVector].setColor3Float(green);
 	this->vertices[posInVector].setFlagColor("green");
 
-	it = std::find(this->vertices.begin(), this->vertices.end()-1, this->triangles[0].vertexB);
+	it = std::find(this->vertices.begin(), this->vertices.end(), this->triangles.back().vertexB);
 	posInVector = std::distance(this->vertices.begin(), it);
 	this->vertices[posInVector].setColor3Float(yellow);
 	this->vertices[posInVector].setFlagColor("yellow");
 
-	it = std::find(this->vertices.begin(), this->vertices.end()-1, this->triangles[0].vertexC);
+	it = std::find(this->vertices.begin(), this->vertices.end(), this->triangles.back().vertexC);
 	posInVector = std::distance(this->vertices.begin(), it);
 	this->vertices[posInVector].setColor3Float(pink);
 	this->vertices[posInVector].setFlagColor("pink");
 
 	std::cout << "Coloring rest of polygon" << std::endl;
-	for(int i = 1; i < this->triangles.size(); i++)
+	for(int i = this->triangles.size()-2; i >= 0; i--)
 	{
 		std::cout << "Coloring a triangle" << std::endl;
 
@@ -244,19 +248,19 @@ void Polygon::paintVertices()
 
 		std::string colors[3];
 
-		it = std::find(this->vertices.begin(), this->vertices.end()-1, this->triangles[i].vertexA);
+		it = std::find(this->vertices.begin(), this->vertices.end(), this->triangles[i].vertexA);
 		int posInVectorA = std::distance(this->vertices.begin(), it);
 
 		colors[0] = this->vertices[posInVectorA].getFlagColor();
 		std::cout << colors[0] << std::endl;
 
-		it = std::find(this->vertices.begin(), this->vertices.end()-1, this->triangles[i].vertexB);
+		it = std::find(this->vertices.begin(), this->vertices.end(), this->triangles[i].vertexB);
 		int posInVectorB = std::distance(this->vertices.begin(), it);
 
 		colors[1] = this->vertices[posInVectorB].getFlagColor();
 		std::cout << colors[1] << std::endl;
 
-		it = std::find(this->vertices.begin(), this->vertices.end()-1, this->triangles[i].vertexC);
+		it = std::find(this->vertices.begin(), this->vertices.end(), this->triangles[i].vertexC);
 		int posInVectorC = std::distance(this->vertices.begin(), it);
 
 		colors[2] = this->vertices[posInVectorC].getFlagColor();

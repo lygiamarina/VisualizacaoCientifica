@@ -4,20 +4,24 @@
 		"selected_items":
 		[
 			[
-				"tria",
-				"triangulatedPolygon"
-			],
-			[
-				"ver",
-				"verticesPaintedPolygon"
+				"T",
+				"T"
 			],
 			[
 				"G",
-				"GL"
+				"G"
 			],
 			[
 				"color",
-				"colors"
+				"colorToPaint"
+			],
+			[
+				"ver",
+				"vertices"
+			],
+			[
+				"tria",
+				"triangles"
 			],
 			[
 				"pos",
@@ -280,7 +284,7 @@
 			"file": "src/Polygon.cpp",
 			"settings":
 			{
-				"buffer_size": 11100,
+				"buffer_size": 11188,
 				"line_ending": "Unix"
 			}
 		},
@@ -288,7 +292,7 @@
 			"file": "src/KeyboardHandler.cpp",
 			"settings":
 			{
-				"buffer_size": 1558,
+				"buffer_size": 1827,
 				"line_ending": "Unix"
 			}
 		},
@@ -352,7 +356,7 @@
 			"file": "src/Polygon.h",
 			"settings":
 			{
-				"buffer_size": 855,
+				"buffer_size": 870,
 				"line_ending": "Unix"
 			}
 		},
@@ -430,7 +434,7 @@
 	"groups":
 	[
 		{
-			"selected": 5,
+			"selected": 1,
 			"sheets":
 			[
 				{
@@ -527,8 +531,8 @@
 						"selection":
 						[
 							[
-								1072,
-								1072
+								1956,
+								1956
 							]
 						],
 						"settings":
@@ -537,7 +541,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1020.0,
+						"translation.y": 950.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -554,8 +558,8 @@
 						"selection":
 						[
 							[
-								860,
-								860
+								1797,
+								1797
 							]
 						],
 						"settings":
@@ -564,7 +568,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 561.0,
+						"translation.y": 882.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -574,15 +578,15 @@
 					"file": "src/Polygon.cpp",
 					"settings":
 					{
-						"buffer_size": 11100,
+						"buffer_size": 11188,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								7309,
-								7309
+								9857,
+								9857
 							]
 						],
 						"settings":
@@ -591,7 +595,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1428.0,
+						"translation.y": 5848.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -601,15 +605,15 @@
 					"file": "src/KeyboardHandler.cpp",
 					"settings":
 					{
-						"buffer_size": 1558,
+						"buffer_size": 1827,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1044,
-								1044
+								807,
+								807
 							]
 						],
 						"settings":
@@ -618,7 +622,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 612.0,
+						"translation.y": 442.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -822,15 +826,15 @@
 					"file": "src/Polygon.h",
 					"settings":
 					{
-						"buffer_size": 855,
+						"buffer_size": 870,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								397,
-								397
+								425,
+								425
 							]
 						],
 						"settings":
@@ -839,7 +843,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 221.0,
+						"translation.y": 354.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"

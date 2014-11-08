@@ -5,13 +5,14 @@
 #include "VertexStructs.h"
 #include "PolygonVertex.h"
 #include <vector>
+#include <deque>
 
 class Polygon
 {
 private:
 	std::vector<PolygonVertex> vertices;
 	std::vector<PolygonDiagonal> diagonals;
-	std::vector<PolygonTriangle> triangles; 
+	std::deque<PolygonTriangle> triangles; 
 	bool closedPolygon;
 	bool triangulatedPolygon;
 	bool verticesPaintedPolygon;
@@ -20,7 +21,7 @@ public:
 	Polygon();
 
 	void triangulate();
-	std::vector<PolygonDiagonal> triangulateByDiagonals(std::vector<PolygonVertex> inVertices);
+	std::deque<PolygonTriangle> triangulateByDiagonals(std::vector<PolygonVertex> inVertices);
 	void setCounterClockwise();
 	void colorVertices();
 	void paintVertices();

@@ -2,10 +2,13 @@
 #include <CGAL/Projection_traits_xy_3.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <GL/glut.h>
+#include "GL/gl.h"
 #include <fstream>
 #include <iostream>
 #include <assert.h>
 #include <math.h>
+
+using namespace std;
 
 // Main CGAL types
 typedef CGAL::Cartesian<double> Repr;
@@ -14,6 +17,7 @@ typedef CGAL::Delaunay_triangulation_2<Gt> Delaunay; // A Delaunay triangulation
 typedef Repr::Point_3 Point;  // A Point in 3D
 typedef Repr::Vector_3 Vector;  // A Vector in 3D
 typedef Repr::Plane_3 Plane;  // A Plane in 3D
+typedef Repr::Segment_3 myLineSegment; //A 3D line segment
 typedef std::list<Point> myPolyline; // A polygonal line
 typedef std::list<myPolyline> PolylineSet; // A set of polylines
 typedef std::list<Plane> PlaneSet; // A set of planes
@@ -105,9 +109,10 @@ void draw (const PolylineSet& pls)
 Delaunay dt; // A Delaunay Triangulation
 PlaneSet planes; // Planes for which intersection curves are computed
 PolylineSet curves; // Intersection curves
+myLineSegment currentSegment; //Segment for mouse ray
 
 Point center;  // Center of dt´s minimum enclosing parallelepiped
-int width = 400, height = 300;  // Window size
+int width = 800, height = 600;  // Window size
 int activebutton;  // Which mouse button was pressed
 int xmouse, ymouse;  // Coords where mouse was pressed
 double xangle = 0.0, yangle = 0.0; // Angles for viewing terrain
@@ -135,48 +140,105 @@ void init ()
 
 void display ()
 {
-    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode (GL_MODELVIEW);
-    glLoadIdentity ();
-    glTranslatef (center[0], center[1], center[2]);
-    glRotatef (xangle, 1.0, 0.0, 0.0);
-    glRotatef (yangle, 0.0, 1.0, 0.0);
-    glTranslatef (-center[0], -center[1], -center[2]);
-    glMultMatrixd (modelview);
-       draw (dt);
-       draw (curves);
-    glutSwapBuffers();
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
+	glTranslatef (center[0], center[1], center[2]);
+	glRotatef (xangle, 1.0, 0.0, 0.0);
+	glRotatef (yangle, 0.0, 1.0, 0.0);
+	glTranslatef (-center[0], -center[1], -center[2]);
+	glMultMatrixd (modelview);
+	draw (dt);
+	draw (curves);
+	glColor3f(1.0,0.0,0.0);
+	glBegin(GL_LINE_STRIP);
+	glVertex3f(currentSegment.source()[0], currentSegment.source()[1], currentSegment.source()[2]);
+	glVertex3f(currentSegment.target()[0], currentSegment.target()[1], currentSegment.target()[2]);
+	glEnd();
+	glutSwapBuffers();
 }
 
 void reshape (int wid, int hgt)
 {
-    glViewport(0,0,width=wid,height=hgt);
+    glViewport(0,0, wid, hgt);
 }
 
-void mouse (int button, int state, int x, int y)
+ void createMouseRay(int mouseX, int mouseY)
 {
-    xmouse = x;
-    ymouse = y;
-    if (button == GLUT_LEFT_BUTTON) {
-        if (state == GLUT_UP) {
-            glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
-            xangle = 0; yangle = 0;
-        }
-    }
-    activebutton = button;
-    glutPostRedisplay ();
+	GLdouble matModelView[16], matProjection[16]; 
+	GLint viewport[4]; 
+	GLdouble m_startX, m_startY, m_startZ;
+	GLdouble m_endX, m_endY, m_endZ;
+
+	// get matrix and viewport:
+	glGetDoublev( GL_MODELVIEW_MATRIX, matModelView ); 
+	glGetDoublev( GL_PROJECTION_MATRIX, matProjection ); 
+	glGetIntegerv( GL_VIEWPORT, viewport ); 
+
+	// window pos of mouse, Y is inverted on Windows
+	double winX = (double)mouseX; 
+	double winY = viewport[3] - (double)mouseY; 
+
+	// get point on the 'near' plane (third param is set to 0.0)
+	gluUnProject(winX, winY, 0.0, matModelView, matProjection, 
+	 viewport, &m_startX, &m_startY, &m_startZ); 
+
+	// get point on the 'far' plane (third param is set to 1.0)
+	gluUnProject(winX, winY, 1.0, matModelView, matProjection, 
+	 viewport, &m_endX, &m_endY, &m_endZ); 
+
+	//Defining segment
+	Point startPoint = Point(m_startX, m_startY, m_startZ);
+	Point endPoint = Point(m_endX, m_endY, m_endZ);
+	currentSegment = myLineSegment(startPoint, endPoint);
+
+	// now you can create a ray from m_start to m_end
+	cout << "start position: " << endl;
+	cout << currentSegment.source()[0] << endl; 
+	cout << currentSegment.source()[1] << endl; 
+	cout << currentSegment.source()[2] << endl; 
+	cout << "end position" << endl;
+	cout << m_endX << endl; 
+	cout << m_endY << endl; 
+	cout << m_endZ << endl; 
+} 
+
+
+
+void mouseClickHandler (int button, int state, int x, int y)
+{
+	xmouse = x;
+	ymouse = y;
+	if (button == GLUT_LEFT_BUTTON) {
+		if (state == GLUT_UP) {
+		    glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
+		    xangle = 0; yangle = 0;
+		}
+		createMouseRay(x, y);
+	}
+	activebutton = button;  //saves the camera rotation
+	glutPostRedisplay ();
 }
 
-void motion (int x, int y)
+//This function only detects the mouse movement while we are clicking a button
+void mouseActiveMotionHandler (int x, int y)
 {
-    if (activebutton == GLUT_LEFT_BUTTON) {
+    if (activebutton == GLUT_RIGHT_BUTTON) 
+    {
         yangle = (x - xmouse) * 360 / width;
         xangle = (y - ymouse) * 180 / height;
     }
-    else {
-    }
     glutPostRedisplay ();
 }
+
+//This function detects the mouse movement while the mouse is on this window
+void mousePassiveMotionHandler (int x, int y)
+{
+    //cout << "mouse moving" << endl;
+}
+
+
+
 
 int main(int argc, char * argv [])
 {
@@ -206,9 +268,14 @@ int main(int argc, char * argv [])
     glutInitWindowPosition (100, 100);
     glutCreateWindow ("Terrain");
     glutDisplayFunc(display);
-    glutMouseFunc (mouse);
-    glutMotionFunc (motion);
+    
+    //Mouse callback functions
+    glutMouseFunc (mouseClickHandler);
+    glutMotionFunc (mouseActiveMotionHandler);
+    glutPassiveMotionFunc(mousePassiveMotionHandler);
+    
     glutReshapeFunc (reshape);
+    
     init ();
     glutMainLoop();
     return 0;
