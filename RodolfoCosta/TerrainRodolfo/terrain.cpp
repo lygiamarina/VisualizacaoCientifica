@@ -14,14 +14,18 @@ using namespace std;
 typedef CGAL::Cartesian<double> Repr;
 typedef CGAL::Projection_traits_xy_3<Repr> Gt;
 typedef CGAL::Delaunay_triangulation_2<Gt> Delaunay;    //A Delaunay triangulation
-typedef Repr::Point_3 Point;                            //A Point in 3D
+typedef Repr::Point_3 Point3D;                           //A Point in 3D
 typedef Repr::Point_2 Point2D;                          //A Point in 2D
-typedef Repr::Triangle_3 Triangle;                      //Triangle in 3D
+
+typedef Repr::Triangle_3 Triangle3D;                     //Triangle in 3D
 typedef Repr::Triangle_2 Triangle2D;                    //Triangle in 2D
-typedef Repr::Vector_3 Vector;                          //A Vector in 3D
+
+typedef Repr::Vector_3 Vector3D;                         //A Vector in 3D
 typedef Repr::Vector_2 Vector2D;                        //A Vector in 2D
-typedef Repr::Segment_3 LineSegment;                    //A 3D line segment
+
+typedef Repr::Segment_3 LineSegment3D;                    //A 3D line segment
 typedef Repr::Segment_2 LineSegment2D;                  //A 2D LineSegment
+
 typedef Repr::Ray_2 Ray2D;                              //2D Ray
 
 /**
@@ -32,35 +36,35 @@ typedef Repr::Ray_2 Ray2D;                              //2D Ray
  * @param min minimum coordinates of the parallelepiped (output)
  * @param max maximum coordinates of the parallelepiped (output)
  **/
-void limits (Delaunay& triang, Point& min, Point& max)
+void limits (Delaunay& triang, Point3D& min, Point3D& max)
 {
     Delaunay::Point_iterator ip = triang.points_begin();
     assert (ip != triang.points_end());
     double mincoord[3],maxcoord[3];
-    Point p = *ip++;
+    Point3D p = *ip++;
     for (int i = 0; i < 3; ++i) { mincoord [i] = maxcoord [i] = p [i]; }
     while (ip != triang.points_end()) {
-        Point p = *ip++;
+        Point3D p = *ip++;
         for (int i = 0; i < 3; ++i) {
             if (p [i] < mincoord [i]) mincoord [i] = p[i];
             else if (p [i] > maxcoord [i]) maxcoord [i] = p[i];
         }
     }
-    min = Point (mincoord [0], mincoord [1], mincoord [2]);
-    max = Point (maxcoord [0], maxcoord [1], maxcoord [2]);
+    min = Point3D (mincoord [0], mincoord [1], mincoord [2]);
+    max = Point3D (maxcoord [0], maxcoord [1], maxcoord [2]);
 }
 
 /**
-* Returns gradient of a triangle
+* Returns a 2D gradient of a 3D triangle
 * 
 * @param face Triangle from a Delaunay Face (input)
 * @return gradient Computed gradient of triangle
 **/
-Vector2D calcGradientOfTriangle(Triangle face)
+Vector2D calculateGradient(Triangle3D face)
 {
-    Vector u(face.vertex(0), face.vertex(1));
-    Vector v(face.vertex(0), face.vertex(2));
-    Vector normal = CGAL::cross_product(u, v);
+    Vector3D u(face.vertex(0), face.vertex(1));
+    Vector3D v(face.vertex(0), face.vertex(2));
+    Vector3D normal = CGAL::cross_product(u, v);
 
     Vector2D gradient(-normal.x()/normal.z(), -normal.y()/normal.z());
 
@@ -85,37 +89,29 @@ int getGradientIntersection(Delaunay::Face face)
     * Edge opposite to Vertex(2): return 32 > log2(32) = 5 => 5-3 = 2
     */
 
-    Vector2D gradient;
+    Point3D p = (*(face.vertex(0))).point();
+    Point3D q = (*(face.vertex(1))).point();
+    Point3D r = (*(face.vertex(2))).point();
+    
+    Point2D p2D = Point2D(p.x(), p.y());
+    Point2D q2D = Point2D(q.x(), q.y()); 
+    Point2D r2D = Point2D(r.x(), r.y());
+    Point2D source2D = CGAL::barycenter(p2D, 0.33, q2D, 0.33, r2D, 0.33);
+    
+    Triangle2D projectedTriangle = Triangle2D(p2D, q2D, r2D);
+    
+    LineSegment2D edgePQ = LineSegment2D(p2D, q2D);
+    LineSegment2D edgeQR = LineSegment2D(q2D, r2D);
+    LineSegment2D edgeRP = LineSegment2D(r2D, p2D);
 
-    Point p, q, r;
-    Point2D p2D, q2D, r2D, source2D;
-    Triangle2D projectedTriangle;
-    LineSegment2D edgePQ, edgeQR, edgeRP;
-
-    Ray2D gradientRay;
+    Vector2D gradient = calculateGradient(Triangle3D(p, q, r));
+    
+    Ray2D gradientRay = Ray2D(source2D, gradient);
+    
     CGAL::Object gradientIntersection;
 
     Point2D intersectedPoint;
-
-    p = (*(face.vertex(0))).point();
-    q = (*(face.vertex(1))).point();
-    r = (*(face.vertex(2))).point();  
-
-    p2D = Point2D(p.x(), p.y());
-    q2D = Point2D(q.x(), q.y());
-    r2D = Point2D(r.x(), r.y());
-    source2D = CGAL::barycenter(p2D, 0.33, q2D, 0.33, r2D, 0.33);
-
-    edgePQ = LineSegment2D(p2D, q2D);
-    edgeQR = LineSegment2D(q2D, r2D);
-    edgeRP = LineSegment2D(r2D, p2D);
-
-    projectedTriangle = Triangle2D(p2D, q2D, r2D);
-
-    gradient = calcGradientOfTriangle(Triangle(p, q, r));
-
-    gradientRay = Ray2D(source2D, gradient);
-
+    
     gradientIntersection = CGAL::intersection(p2D, gradientRay);
     if (gradientIntersection != NULL) { return 1; }
 
@@ -159,7 +155,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
     previousFace = currentFace;
 
-    gradient = calcGradientOfTriangle(tr.triangle(currentFace));
+    gradient = calculateGradient(tr.triangle(currentFace));
     gradientModule = (gradient.x() * gradient.x()) + (gradient.y() * gradient.y());
 
     while (gradientModule > 0)
@@ -223,7 +219,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
                 Delaunay::Face_handle faceHandleCt = faceCt;
 
-                Vector2D previousGradientLocal = calcGradientOfTriangle(tr.triangle(faceHandleCt));
+                Vector2D previousGradientLocal = calculateGradient(tr.triangle(faceHandleCt));
                 Vector2D gradientLocal = previousGradient;
 
                 Delaunay::Face_circulator done(faceCt); 
@@ -242,7 +238,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
                     if (faceHandleCt == candidateFromPrevious || faceHandleCt == candidateFromCurrent)
                     {
-                        gradientLocal = calcGradientOfTriangle(tr.triangle(faceHandleCt));
+                        gradientLocal = calculateGradient(tr.triangle(faceHandleCt));
 
                         gradientModuleLocal = (gradientLocal.x() * gradientLocal.x()) + 
                                                         (gradientLocal.y() * gradientLocal.y());
@@ -292,7 +288,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
             Delaunay::Face_circulator faceCt = tr.incident_faces(vertex);
 
             Delaunay::Face_handle faceHandleCt = faceCt;
-            Vector2D previousGradientLocal = calcGradientOfTriangle(tr.triangle(faceHandleCt));
+            Vector2D previousGradientLocal = calculateGradient(tr.triangle(faceHandleCt));
             Vector2D gradientLocal = previousGradient;
 
             Delaunay::Face_circulator done(faceCt);
@@ -307,7 +303,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                 faceHandleCt = faceCt;
                 if (faceHandleCt == candidateFromCurrent1 && faceHandleCt == candidateFromCurrent2)
                 {
-                    gradient = calcGradientOfTriangle(tr.triangle(faceHandleCt));
+                    gradient = calculateGradient(tr.triangle(faceHandleCt));
                     gradientModuleLocal = (gradientLocal.x() * gradientLocal.x()) + 
                                                     (gradientLocal.y() * gradientLocal.y());
 
@@ -340,7 +336,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 * @param position A point in 3D to have Z projected
 * @return m_projectedZ A GLdouble with projected value of Z
 **/
-GLdouble getProjectedZ(Point position)
+GLdouble getProjectedZ(Point3D position)
 {
     GLdouble matModelView[16], matProjection[16]; 
     GLint viewport[4]; 
@@ -366,23 +362,23 @@ GLdouble getProjectedZ(Point position)
 * 
 * @return returnIt An iterator to the closes face returned as Face_handle
 **/
-Delaunay::Face_handle getFirstIntersectedFace (const Delaunay& tr, LineSegment seg)
+Delaunay::Face_handle getFirstIntersectedFace (const Delaunay& tr, LineSegment3D seg)
 {
     Delaunay::Finite_faces_iterator it = tr.finite_faces_begin();
     Delaunay::Finite_faces_iterator returnIt = tr.finite_faces_end();
-    Point currentPoint;
-    Point previousPoint;
+    Point3D currentPoint;
+    Point3D previousPoint;
     CGAL::Object result;
     bool firstTriangleFound = false;
 
     for (it = tr.finite_faces_begin(); it != tr.finite_faces_end(); it++) {
         Delaunay::Face trFace = *it;
 
-        Point p = (*(trFace.vertex(0))).point();
-        Point q = (*(trFace.vertex(1))).point();
-        Point r = (*(trFace.vertex(2))).point();
+        Point3D p = (*(trFace.vertex(0))).point();
+        Point3D q = (*(trFace.vertex(1))).point();
+        Point3D r = (*(trFace.vertex(2))).point();
 
-        Triangle face(p, q, r);
+        Triangle3D face(p, q, r);
         result = CGAL::intersection(face, seg);
 
         if (CGAL::assign(currentPoint, result))
@@ -433,7 +429,7 @@ void draw (const Delaunay& tr, const std::vector<Delaunay::Face_handle> intersec
             }
         }
         for (int i = 0; i < 3; i++) {
-            Point p = (*(f.vertex (i))).point();
+            Point3D p = (*(f.vertex (i))).point();
             glVertex3f (p[0], p[1], p[2]);
         }
     }
@@ -446,7 +442,7 @@ void draw (const Delaunay& tr, const std::vector<Delaunay::Face_handle> intersec
         glBegin(GL_LINE_LOOP);
         glColor3f (1.0, 1.0, 1.0);  // white
         for (int i = 0; i < 3; i++) {
-            Point p = (*(f.vertex (i))).point();
+            Point3D p = (*(f.vertex (i))).point();
             glVertex3f (p[0], p[1], p[2]);
         }
         glEnd ();
@@ -459,10 +455,10 @@ void draw (const Delaunay& tr, const std::vector<Delaunay::Face_handle> intersec
  * Global variables
  **/
 Delaunay dt; // A Delaunay Triangulation
-LineSegment currentSegment; //Segment for mouse ray
+LineSegment3D currentSegment; //Segment for mouse ray
 std::vector<Delaunay::Face_handle> intersectedFaces;
 
-Point center;  // Center of dt´s minimum enclosing parallelepiped
+Point3D center;  // Center of dt´s minimum enclosing parallelepiped
 int width = 800, height = 600;  // Window size
 int activebutton;  // Which mouse button was pressed
 int xmouse, ymouse;  // Coords where mouse was pressed
@@ -476,12 +472,12 @@ void init ()
 {
     // Create an orthogonal projection system for viewing
     // dt from any angle
-    Point min, max;
+    Point3D min, max;
     limits (dt, min, max);
-    Vector size = 0.5 * (max - min);
+    Vector3D size = 0.5 * (max - min);
     center = min + size;
     double radius = sqrt (size * size);
-    size = Vector (radius, radius, radius);
+    size = Vector3D (radius, radius, radius);
     min = center - size;
     max = center + size;
     glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
@@ -518,7 +514,7 @@ void reshape (int wid, int hgt)
 }
 
 /**
- * Creates a segment from mouse click position 'till backs
+ * Creates a segment from mouse click position to the world's most distant z.
  * 
  * @param mouseX Mouse's X position
  * @param mouseY Mouse's Y position
@@ -548,9 +544,9 @@ void reshape (int wid, int hgt)
 	 viewport, &m_endX, &m_endY, &m_endZ); 
 
 	//Defining segment
-	Point startPoint(m_startX, m_startY, m_startZ);
-	Point endPoint(m_endX, m_endY, m_endZ);
-	currentSegment = LineSegment(startPoint, endPoint);
+	Point3D startPoint(m_startX, m_startY, m_startZ);
+	Point3D endPoint(m_endX, m_endY, m_endZ);
+	currentSegment = LineSegment3D(startPoint, endPoint);
 } 
 
 void mouseClickHandler (int button, int state, int x, int y)
@@ -592,8 +588,8 @@ int main(int argc, char * argv [])
 {
     // Read the terrain data into dt
     std::ifstream terrainfile ("terraindata.txt");
-    std::istream_iterator<Point> beginpt(terrainfile);
-    std::istream_iterator<Point> endpt;
+    std::istream_iterator<Point3D> beginpt(terrainfile);
+    std::istream_iterator<Point3D> endpt;
     dt.insert(beginpt, endpt);
 
     //
