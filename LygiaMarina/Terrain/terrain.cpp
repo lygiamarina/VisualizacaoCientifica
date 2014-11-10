@@ -126,15 +126,15 @@ int getGradientIntersection(Delaunay::Face face)
 
     gradientIntersection = CGAL::intersection(r2D, gradientRay);
     if (gradientIntersection != NULL) { return 4; }
-
-    gradientIntersection = CGAL::intersection(edgePQ, gradientRay);
-    if (gradientIntersection != NULL) { return 32; }
-
+    
     gradientIntersection = CGAL::intersection(edgeQR, gradientRay);
     if (gradientIntersection != NULL) { return 8; }
 
     gradientIntersection = CGAL::intersection(edgeRP, gradientRay);
     if (gradientIntersection != NULL) { return 16; }
+
+    gradientIntersection = CGAL::intersection(edgePQ, gradientRay);
+    if (gradientIntersection != NULL) { return 32; }
 
     return 8;  
 }
@@ -179,7 +179,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
             std::cout << "Got neighbor" << std::endl;
 
-            if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
+            if (nextFace != previousFace)
             {
                 std::cout << "Got next face" << std::endl;
                 previousFace = currentFace;
@@ -222,6 +222,11 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                 int gradientIntersectionFromCurrent = log2(getGradientIntersection(*candidateFromCurrent));
                 int gradientIntersectionFromPrevious = log2(getGradientIntersection(*candidateFromPrevious));
                 
+                bool teste1 = gradientIntersectionFromCurrent == candidateFromCurrent->index(nextVertex);
+                std::cout << "From current passed" << std::endl;
+                bool teste2 = gradientIntersectionFromPrevious == candidateFromPrevious->index(nextVertex);
+                std::cout << "From previous passed" << std::endl;
+                
                 if (gradientIntersectionFromCurrent == candidateFromCurrent->index(nextVertex) && 
 					gradientIntersectionFromPrevious == candidateFromPrevious->index(nextVertex)) 
 				{ 
@@ -248,13 +253,17 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 					double previousModuleLocal = (previousGradientLocal.x() * previousGradientLocal.x()) + 
                                         (previousGradientLocal.y() * previousGradientLocal.y());
                                         
-					if (gradientModuleLocal < previousModuleLocal) 
+					if (gradientModuleLocal <= previousModuleLocal) 
 					{ 
-						nextFace = candidateFromCurrent; 
+						nextFace = candidateFromCurrent;
+						if (tr.is_infinite(nextFace) || std::find(intersected.begin(), intersected.end(), nextFace) != intersected.end())
+						{ nextFace = candidateFromPrevious; }
 					}
 					else
 					{ 
 						nextFace = candidateFromPrevious; 
+						if (tr.is_infinite(nextFace) || std::find(intersected.begin(), intersected.end(), nextFace) != intersected.end())
+						{ nextFace = candidateFromCurrent; }
 					}
 						
 				}			
@@ -268,6 +277,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 						poppedFaces.pop_back();
 						previousFace = currentFace;
 					}
+					else { previousFace = intersected.back(); }
                     intersected.push_back(nextFace);
                 }
                 else 
