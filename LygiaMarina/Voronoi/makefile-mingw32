@@ -1,0 +1,37 @@
+.SUFFIXES: .C .cpp .cxx .h
+
+# include $(CGAL_MAKEFILE)
+
+# flags for C++ compiler:
+
+CFLAGS 		=
+
+# libraries to link with:
+
+CGAL_ROOT_DIR   =       /usr/i686-pc-mingw32/sys-root/mingw
+
+LIBPATH 	=       /usr/i686-pc-mingw32/sys-root/mingw/lib/
+
+LDFLAGS 	= 	-lCGAL
+
+CXX             =       i686-pc-mingw32-g++
+
+# ***********************************************************************************
+all:	VoronoiDemo
+
+VoronoiDemo:	VoronoiDemo.o
+	$(CXX)  -o $@.exe $^ $(CFLAGS) $(LIBPATH) $(LDFLAGS) -lglut -lglu32 -lopengl32
+
+.c.o:	$*.h
+	$(CXX) -I/usr/i686-pc-mingw32/sys-root/mingw/include -c $(CFLAGS) $*.c
+
+.cpp.o:	$*.h
+	$(CXX) -I/usr/i686-pc-mingw32/sys-root/mingw/include -c $(CFLAGS) $*.cpp
+
+clean:
+	rm *.o VoronoiDemo
+
+.C.o:	$*.h
+	$(CXX) -c $(CFLAGS) $*.C
+
+

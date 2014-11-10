@@ -104,7 +104,7 @@ int getGradientIntersection(Delaunay::Face face)
     p2D = Point2D(p.x(), p.y());
     q2D = Point2D(q.x(), q.y());
     r2D = Point2D(r.x(), r.y());
-    source2D = CGAL::barycenter(p2D, 0.33, q2D, 0.33, r2D, 0.33);
+    source2D = CGAL::barycenter(p2D, 1, q2D, 1, r2D, 1);
 
     edgePQ = LineSegment2D(p2D, q2D);
     edgeQR = LineSegment2D(q2D, r2D);
@@ -115,6 +115,8 @@ int getGradientIntersection(Delaunay::Face face)
     gradient = calcGradientOfTriangle(Triangle(p, q, r));
 
     gradientRay = Ray2D(source2D, gradient);
+    
+    std::cout << "Gradient: " << gradient << std::endl;
 
     gradientIntersection = CGAL::intersection(p2D, gradientRay);
     if (gradientIntersection != NULL) { return 1; }
@@ -124,17 +126,17 @@ int getGradientIntersection(Delaunay::Face face)
 
     gradientIntersection = CGAL::intersection(r2D, gradientRay);
     if (gradientIntersection != NULL) { return 4; }
-
-    gradientIntersection = CGAL::intersection(edgePQ, gradientRay);
-    if (CGAL::assign(intersectedPoint, gradientIntersection)) { return 32; }
-
+    
     gradientIntersection = CGAL::intersection(edgeQR, gradientRay);
-    if (CGAL::assign(intersectedPoint, gradientIntersection)) { return 8; }
+    if (gradientIntersection != NULL) { return 8; }
 
     gradientIntersection = CGAL::intersection(edgeRP, gradientRay);
-    if (CGAL::assign(intersectedPoint, gradientIntersection)) { return 16; }
+    if (gradientIntersection != NULL) { return 16; }
 
-    return 0;  
+    gradientIntersection = CGAL::intersection(edgePQ, gradientRay);
+    if (gradientIntersection != NULL) { return 32; }
+
+    return 8;  
 }
 
 /**
@@ -145,6 +147,7 @@ int getGradientIntersection(Delaunay::Face face)
 **/
 void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &intersected)
 {
+	std::vector<Delaunay::Face_handle> poppedFaces;
     Delaunay::Face_handle previousFace;
     Delaunay::Face_handle currentFace;
 
@@ -168,12 +171,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
         currentGradientIntersection = getGradientIntersection(*currentFace);
 
-        if (currentGradientIntersection == 0)
-        {
-            std::cout << "Error on getting intersection with gradient" << std::endl;
-            break;
-        }
-        else if (currentGradientIntersection > 4)
+        if (currentGradientIntersection > 4)
         {
             std::cout << "Current gradient integer pointing to edge: " << currentGradientIntersection << std::endl;
             int indexForNextFace = log2(currentGradientIntersection) - 3;
@@ -181,7 +179,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
             std::cout << "Got neighbor" << std::endl;
 
-            if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
+            if (nextFace != previousFace)
             {
                 std::cout << "Got next face" << std::endl;
                 previousFace = currentFace;
@@ -189,10 +187,10 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
             }
             else
             {
-				Delaunay::Face_handle poppedFace = currentFace;
-				intersected.pop_back();
-				currentFace = intersected.back();
                 std::cout << "Got maximum edge" << std::endl;
+                poppedFaces.push_back(intersected.back());
+                intersected.pop_back();
+                
                 Delaunay::Vertex_handle q;
                 Delaunay::Vertex_handle r;
 
@@ -212,55 +210,81 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                     r = currentFace->vertex(1);
                 }
 
+
                 Delaunay::Vertex_handle nextVertex = q->point().z() < r->point().z() ? q : r;
+                Delaunay::Vertex_handle vertexOppToNeighbor = q->point().z() < r->point().z() ? r : q;
 
-                Delaunay::Face_circulator faceCt = tr.incident_faces(nextVertex);
-
-                while (tr.is_infinite(faceCt))
-                {
-                    faceCt++;
-                }
-
-                Delaunay::Face_handle faceHandleCt = faceCt;
-
-                Vector2D previousGradientLocal = calcGradientOfTriangle(tr.triangle(faceHandleCt));
-                Vector2D gradientLocal = previousGradient;
-
-                Delaunay::Face_circulator done(faceCt); 
-
-                double gradientModuleLocal;
-                double previousModuleLocal;
-                previousModuleLocal = (previousGradientLocal.x() * previousGradientLocal.x()) + 
+                Delaunay::Face_handle candidateFromCurrent = currentFace->neighbor(currentFace->index(vertexOppToNeighbor));
+                Delaunay::Face_handle candidateFromPrevious = previousFace->neighbor(previousFace->index(vertexOppToNeighbor));
+                
+                std::cout << "Passed candidates construction" << std::endl;
+                                        
+                int gradientIntersectionFromCurrent = log2(getGradientIntersection(*candidateFromCurrent));
+                int gradientIntersectionFromPrevious = log2(getGradientIntersection(*candidateFromPrevious));
+                
+                bool teste1 = gradientIntersectionFromCurrent == candidateFromCurrent->index(nextVertex);
+                std::cout << "From current passed" << std::endl;
+                bool teste2 = gradientIntersectionFromPrevious == candidateFromPrevious->index(nextVertex);
+                std::cout << "From previous passed" << std::endl;
+                
+                if (gradientIntersectionFromCurrent == candidateFromCurrent->index(nextVertex) && 
+					gradientIntersectionFromPrevious == candidateFromPrevious->index(nextVertex)) 
+				{ 
+					break; 
+				}
+				else if (gradientIntersectionFromCurrent != candidateFromCurrent->index(nextVertex) &&
+						gradientIntersectionFromPrevious == candidateFromPrevious->index(nextVertex))
+				{
+					nextFace = candidateFromCurrent;
+				}
+				else if (gradientIntersectionFromCurrent == candidateFromCurrent->index(nextVertex) &&
+						gradientIntersectionFromPrevious != candidateFromPrevious->index(nextVertex))
+				{
+					nextFace = candidateFromPrevious;
+				}
+				else
+				{
+					std::cout << "No gradient points to a vertex of the edge" << std::endl;
+					Vector2D gradientLocal = calcGradientOfTriangle(tr.triangle(candidateFromCurrent));
+					Vector2D previousGradientLocal = calcGradientOfTriangle(tr.triangle(candidateFromPrevious));
+                
+					double gradientModuleLocal = (gradientLocal.x() * gradientLocal.x()) + 
+                                        (gradientLocal.y() * gradientLocal.y());
+					double previousModuleLocal = (previousGradientLocal.x() * previousGradientLocal.x()) + 
                                         (previousGradientLocal.y() * previousGradientLocal.y());
+                                        
+					if (gradientModuleLocal <= previousModuleLocal) 
+					{ 
+						nextFace = candidateFromCurrent;
+						if (tr.is_infinite(nextFace) || std::find(intersected.begin(), intersected.end(), nextFace) != intersected.end())
+						{ nextFace = candidateFromPrevious; }
+					}
+					else
+					{ 
+						nextFace = candidateFromPrevious; 
+						if (tr.is_infinite(nextFace) || std::find(intersected.begin(), intersected.end(), nextFace) != intersected.end())
+						{ nextFace = candidateFromCurrent; }
+					}
+						
+				}			
 
-                Delaunay::Face_handle candidateFromCurrent = currentFace->neighbor(indexForNextFace);
-                Delaunay::Face_handle candidateFromPrevious = previousFace->neighbor(indexForNextFace);
-
-                do
+                if (std::find(poppedFaces.begin(), poppedFaces.end(), nextFace) == poppedFaces.end() &&
+					std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
                 {
-                    faceHandleCt = faceCt;
-
-                    if (faceHandleCt == candidateFromPrevious || faceHandleCt == candidateFromCurrent)
-                    {
-                        gradientLocal = calcGradientOfTriangle(tr.triangle(faceHandleCt));
-
-                        gradientModuleLocal = (gradientLocal.x() * gradientLocal.x()) + 
-                                                        (gradientLocal.y() * gradientLocal.y());
-
-                        if (gradientModuleLocal > previousModuleLocal)
-                        {
-                            nextFace = faceHandleCt;
-                            previousModuleLocal = gradientModuleLocal;
-                        }
-                    }
-                } while (++faceCt != done);
-
-                if (nextFace != poppedFace && std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
-                {
-                    previousFace = currentFace;
+					if (nextFace == candidateFromCurrent) 
+					{ 
+						intersected.push_back(currentFace); 
+						poppedFaces.pop_back();
+						previousFace = currentFace;
+					}
+					else { previousFace = intersected.back(); }
                     intersected.push_back(nextFace);
                 }
-                else { break; }
+                else 
+                { 
+					std::cout << "An edge is a maximum" << std::endl;
+					break; 
+				}
             }
         }   
         else if (currentGradientIntersection < 8)
@@ -288,36 +312,38 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                 candidateFromCurrent1 = currentFace->neighbor(0); 
                 candidateFromCurrent2 = currentFace->neighbor(1); 
             }
-
-            Delaunay::Face_circulator faceCt = tr.incident_faces(vertex);
-
-            Delaunay::Face_handle faceHandleCt = faceCt;
-            Vector2D previousGradientLocal = calcGradientOfTriangle(tr.triangle(faceHandleCt));
-            Vector2D gradientLocal = previousGradient;
-
-            Delaunay::Face_circulator done(faceCt);
-
-            double gradientModuleLocal;
-            double previousModuleLocal;
-            previousModuleLocal = (previousGradientLocal.x() * previousGradientLocal.x()) + 
-                                    (previousGradientLocal.y() * previousGradientLocal.y());
-
-            do
-            {
-                faceHandleCt = faceCt;
-                if (faceHandleCt == candidateFromCurrent1 && faceHandleCt == candidateFromCurrent2)
-                {
-                    gradient = calcGradientOfTriangle(tr.triangle(faceHandleCt));
-                    gradientModuleLocal = (gradientLocal.x() * gradientLocal.x()) + 
-                                                    (gradientLocal.y() * gradientLocal.y());
-
-                    if (gradientModuleLocal >= previousModuleLocal)
-                    {
-                        nextFace = faceHandleCt;
-                        previousModuleLocal = gradientModuleLocal;
-                    }
-                }
-            } while (++faceCt != done);
+									
+			int gradientIntersectionFromCurrent1 = log2(getGradientIntersection(*candidateFromCurrent1));
+			int gradientIntersectionFromCurrent2 = log2(getGradientIntersection(*candidateFromCurrent2));
+			
+			if (gradientIntersectionFromCurrent1 == candidateFromCurrent1->index(vertex) && 
+				gradientIntersectionFromCurrent2 == candidateFromCurrent2->index(vertex)) 
+			{ 
+				break; 
+			}
+			else if (gradientIntersectionFromCurrent1 != candidateFromCurrent1->index(vertex) &&
+					gradientIntersectionFromCurrent2 == candidateFromCurrent2->index(vertex))
+			{
+				nextFace = candidateFromCurrent1;
+			}
+			else if (gradientIntersectionFromCurrent1 == candidateFromCurrent1->index(vertex) &&
+					gradientIntersectionFromCurrent2 != candidateFromCurrent2->index(vertex))
+			{
+				nextFace = candidateFromCurrent2;
+			}
+			else
+			{
+				Vector2D gradientLocal1 = calcGradientOfTriangle(tr.triangle(candidateFromCurrent1));
+				Vector2D gradientLocal2 = calcGradientOfTriangle(tr.triangle(candidateFromCurrent2));
+			
+				double gradientModuleLocal1 = (gradientLocal1.x() * gradientLocal1.x()) + 
+									(gradientLocal1.y() * gradientLocal1.y());
+				double gradientModuleLocal2 = (gradientLocal2.x() * gradientLocal2.x()) + 
+									(gradientLocal2.y() * gradientLocal2.y());
+									
+				if (gradientModuleLocal1 < gradientModuleLocal2) { nextFace = candidateFromCurrent1; }
+				else { nextFace = candidateFromCurrent2; }
+			}
 
             if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
             {
@@ -330,6 +356,9 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                 break;
             }
         }
+        
+        gradient = calcGradientOfTriangle(tr.triangle(currentFace));
+		gradientModule = (gradient.x() * gradient.x()) + (gradient.y() * gradient.y());
     }
 }
 
