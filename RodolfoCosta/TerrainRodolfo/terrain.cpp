@@ -98,8 +98,6 @@ int getGradientIntersection(Delaunay::Face face)
     Point2D r2D = Point2D(r.x(), r.y());
     Point2D source2D = CGAL::barycenter(p2D, 0.33, q2D, 0.33, r2D, 0.33);
     
-    Triangle2D projectedTriangle = Triangle2D(p2D, q2D, r2D);
-    
     LineSegment2D edgePQ = LineSegment2D(p2D, q2D);
     LineSegment2D edgeQR = LineSegment2D(q2D, r2D);
     LineSegment2D edgeRP = LineSegment2D(r2D, p2D);
@@ -121,14 +119,14 @@ int getGradientIntersection(Delaunay::Face face)
     gradientIntersection = CGAL::intersection(r2D, gradientRay);
     if (gradientIntersection != NULL) { return 4; }
 
-    gradientIntersection = CGAL::intersection(edgePQ, gradientRay);
-    if (CGAL::assign(intersectedPoint, gradientIntersection)) { return 32; }
-
     gradientIntersection = CGAL::intersection(edgeQR, gradientRay);
     if (CGAL::assign(intersectedPoint, gradientIntersection)) { return 8; }
 
     gradientIntersection = CGAL::intersection(edgeRP, gradientRay);
     if (CGAL::assign(intersectedPoint, gradientIntersection)) { return 16; }
+    
+    gradientIntersection = CGAL::intersection(edgePQ, gradientRay);
+    if (CGAL::assign(intersectedPoint, gradientIntersection)) { return 32; }
 
     return 0;  
 }
@@ -139,7 +137,7 @@ int getGradientIntersection(Delaunay::Face face)
 * @param tr Delaunay triangulation (input)
 * @param intersected Vector containing faces of path (output & input)
 **/
-void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &intersected)
+void calculatePath(const Delaunay& tr, std::vector<Delaunay::Face_handle> &intersected)
 {
     Delaunay::Face_handle previousFace;
     Delaunay::Face_handle currentFace;
@@ -171,24 +169,24 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
         }
         else if (currentGradientIntersection > 4)
         {
-            std::cout << "Current gradient integer pointing to edge: " << currentGradientIntersection << std::endl;
+            //std::cout << "Current gradient integer pointing to edge: " << currentGradientIntersection << std::endl;
             int indexForNextFace = log2(currentGradientIntersection) - 3;
             Delaunay::Face_handle nextFace = currentFace->neighbor(indexForNextFace);
 
-            std::cout << "Got neighbor" << std::endl;
+            //std::cout << "Got neighbor" << std::endl;
 
             if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
             {
-                std::cout << "Got next face" << std::endl;
+                //std::cout << "Got next face" << std::endl;
                 previousFace = currentFace;
                 intersected.push_back(nextFace);
             }
             else
             {
-				Delaunay::Face_handle poppedFace = currentFace;
-				intersected.pop_back();
-				currentFace = intersected.back();
-                std::cout << "Got maximum edge" << std::endl;
+		Delaunay::Face_handle poppedFace = currentFace;
+		intersected.pop_back();
+		currentFace = intersected.back();
+                //std::cout << "Got maximum edge" << std::endl;
                 Delaunay::Vertex_handle q;
                 Delaunay::Vertex_handle r;
 
@@ -232,7 +230,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                 Delaunay::Face_handle candidateFromCurrent = currentFace->neighbor(indexForNextFace);
                 Delaunay::Face_handle candidateFromPrevious = previousFace->neighbor(indexForNextFace);
 
-                do
+                while (++faceCt != done)
                 {
                     faceHandleCt = faceCt;
 
@@ -249,7 +247,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                             previousModuleLocal = gradientModuleLocal;
                         }
                     }
-                } while (++faceCt != done);
+                }
 
                 if (nextFace != poppedFace && std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
                 {
@@ -298,7 +296,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
             previousModuleLocal = (previousGradientLocal.x() * previousGradientLocal.x()) + 
                                     (previousGradientLocal.y() * previousGradientLocal.y());
 
-            do
+            while (++faceCt != done)
             {
                 faceHandleCt = faceCt;
                 if (faceHandleCt == candidateFromCurrent1 && faceHandleCt == candidateFromCurrent2)
@@ -313,7 +311,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                         previousModuleLocal = gradientModuleLocal;
                     }
                 }
-            } while (++faceCt != done);
+            }
 
             if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
             {
@@ -322,7 +320,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
             }
             else
             {
-                std::cout << "A vertex is a maximum" << std::endl;
+                //std::cout << "A vertex is a maximum" << std::endl;
                 break;
             }
         }
@@ -331,12 +329,12 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
 
 /**
-* Returns projected Z from the screen's point of view
+* Returns projected Z from the screen's point of view when mouse is left clicked.
 * 
-* @param position A point in 3D to have Z projected
-* @return m_projectedZ A GLdouble with projected value of Z
+* @param position Where the left click happened
+* @return m_projectedZ A GLdouble with the Z value of the left click.
 **/
-GLdouble getProjectedZ(Point3D position)
+GLdouble getMouseZ(Point3D position)
 {
     GLdouble matModelView[16], matProjection[16]; 
     GLint viewport[4]; 
@@ -348,30 +346,32 @@ GLdouble getProjectedZ(Point3D position)
     glGetIntegerv( GL_VIEWPORT, viewport ); 
 
     gluProject(position[0], position[1], position[2], matModelView, matProjection, 
-     viewport, &m_projectedX, &m_projectedY, &m_projectedZ); 
+               viewport, &m_projectedX, &m_projectedY, &m_projectedZ); 
 
     return m_projectedZ;
 }
 
 /**
-* Gets intersected triangle that has minor z
-* Triangle is the closest to the screen
+* Returns the triangle that is closest to the viewer.
 *
-* @param tr  Delaunay triangulation (input)
-* @param seg Line Segment representing ray from mouse click
+* @param tr  Delaunay triangulation (model)
+* @param seg Ray from mouse click
 * 
-* @return returnIt An iterator to the closes face returned as Face_handle
+* @return returnIt An iterator(pointer) to the closest triangle
 **/
-Delaunay::Face_handle getFirstIntersectedFace (const Delaunay& tr, LineSegment3D seg)
+Delaunay::Face_handle getClosestTriangle (const Delaunay& tr, LineSegment3D seg)
 {
     Delaunay::Finite_faces_iterator it = tr.finite_faces_begin();
     Delaunay::Finite_faces_iterator returnIt = tr.finite_faces_end();
+    
     Point3D currentPoint;
     Point3D previousPoint;
+    
     CGAL::Object result;
     bool firstTriangleFound = false;
 
-    for (it = tr.finite_faces_begin(); it != tr.finite_faces_end(); it++) {
+    for (it = tr.finite_faces_begin(); it != tr.finite_faces_end(); it++) 
+    {
         Delaunay::Face trFace = *it;
 
         Point3D p = (*(trFace.vertex(0))).point();
@@ -381,6 +381,7 @@ Delaunay::Face_handle getFirstIntersectedFace (const Delaunay& tr, LineSegment3D
         Triangle3D face(p, q, r);
         result = CGAL::intersection(face, seg);
 
+        //The point with closest Z represents the closest triangle
         if (CGAL::assign(currentPoint, result))
         {
             if(firstTriangleFound == false)
@@ -390,8 +391,8 @@ Delaunay::Face_handle getFirstIntersectedFace (const Delaunay& tr, LineSegment3D
                 returnIt = it;
             }
 
-            GLdouble currentZ = getProjectedZ(currentPoint);
-            GLdouble previousZ = getProjectedZ(previousPoint);
+            GLdouble currentZ = getMouseZ(currentPoint);
+            GLdouble previousZ = getMouseZ(previousPoint);
 
             if(currentZ < previousZ)
             {
@@ -404,6 +405,10 @@ Delaunay::Face_handle getFirstIntersectedFace (const Delaunay& tr, LineSegment3D
     return returnIt;
 }
 
+float firstColor = 0.0f;
+float lastColor = 1.0f;
+float currentColor = 0.1f;
+float colorChangeRate = 0.015f;
 
 /**
  * Draws a Delaunay triangulation
@@ -423,9 +428,13 @@ void draw (const Delaunay& tr, const std::vector<Delaunay::Face_handle> intersec
         glColor3f (0.5, 0.5, 0.5);  // gray
         for (int i = 0; i < intersectedFaces.size(); i++)
         {
-            if (it.base() == intersectedFaces[i])
+            if (it.base() == intersectedFaces[0])
             {
-                glColor3f (0.19, 0.95, 0); 
+                glColor3f (1.0f, 0.0f, 0.0f); 
+            }
+            else if(it.base() == intersectedFaces[i])
+            {
+                glColor3f (currentColor, currentColor, lastColor);
             }
         }
         for (int i = 0; i < 3; i++) {
@@ -447,7 +456,6 @@ void draw (const Delaunay& tr, const std::vector<Delaunay::Face_handle> intersec
         }
         glEnd ();
     }
-
 }
 
 
@@ -491,21 +499,30 @@ void init ()
 
 void display ()
 {
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef (center[0], center[1], center[2]);
-	glRotatef (xangle, 1.0, 0.0, 0.0);
-	glRotatef (yangle, 0.0, 1.0, 0.0);
-	glTranslatef (-center[0], -center[1], -center[2]);
+    glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glMatrixMode (GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef (center[0], center[1], center[2]);
+    glRotatef (xangle, 1.0, 0.0, 0.0);
+    glRotatef (yangle, 0.0, 1.0, 0.0);
+    glTranslatef (-center[0], -center[1], -center[2]);
     glMultMatrixd (modelview);
-	draw (dt, intersectedFaces);
-	glColor3f(1.0,0.0,0.0);
-	glBegin(GL_LINE_STRIP);
-	glVertex3f(currentSegment.source()[0], currentSegment.source()[1], currentSegment.source()[2]);
-	glVertex3f(currentSegment.target()[0], currentSegment.target()[1], currentSegment.target()[2]);
-	glEnd();
-	glutSwapBuffers();
+    draw (dt, intersectedFaces);
+    glColor3f(1.0,0.0,0.0);
+    glBegin(GL_LINE_STRIP);
+    glVertex3f(currentSegment.source()[0], currentSegment.source()[1], currentSegment.source()[2]);
+    glVertex3f(currentSegment.target()[0], currentSegment.target()[1], currentSegment.target()[2]);
+    glEnd();
+    
+    currentColor += colorChangeRate;
+    if((currentColor > (lastColor-0.01f)) || (currentColor < (firstColor+0.01f)))
+    {
+        colorChangeRate *= -1;
+    }
+    //cout << currentColor << endl;
+    
+    glutPostRedisplay ();
+    glutSwapBuffers();
 }
 
 void reshape (int wid, int hgt)
@@ -553,19 +570,26 @@ void mouseClickHandler (int button, int state, int x, int y)
 {
 	xmouse = x;
 	ymouse = y;
-	if (button == GLUT_LEFT_BUTTON) {
-		if (state == GLUT_DOWN) {
-		    //glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
-		    //xangle = 0; yangle = 0;
-            createMouseRay(x, y);
-            intersectedFaces.clear();
-            Delaunay::Face_handle firstFace = getFirstIntersectedFace(dt, currentSegment);
-            if (firstFace != dt.finite_faces_end().base())
+	if (button == GLUT_LEFT_BUTTON) 
+        {
+            if (state == GLUT_DOWN) 
             {
-                intersectedFaces.push_back(firstFace);
-                calcPathToMaximum(dt, intersectedFaces);
+		//glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
+		//xangle = 0; yangle = 0;
+                firstColor = 0.0f;
+                lastColor = 1.0f;
+                currentColor = 0.1f;
+                colorChangeRate = 0.015f;
+                
+                createMouseRay(x, y);
+                intersectedFaces.clear();
+                Delaunay::Face_handle firstFace = getClosestTriangle(dt, currentSegment);
+                if (firstFace != dt.finite_faces_end().base())
+                {
+                    intersectedFaces.push_back(firstFace);
+                    calculatePath(dt, intersectedFaces);
+                }
             }
-		}
 	}
 	activebutton = button;  //saves the camera rotation
 	glutPostRedisplay ();
