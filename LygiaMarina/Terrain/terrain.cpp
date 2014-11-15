@@ -147,6 +147,8 @@ int getGradientIntersection(Delaunay::Face face)
 **/
 void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &intersected)
 {
+	std::cout << "/////////////////////////////////////////////////////////////" << std::endl;
+	std::cout << "Starting path finder" << std::endl;
 	std::vector<Delaunay::Face_handle> poppedFaces;
     Delaunay::Face_handle previousFace;
     Delaunay::Face_handle currentFace;
@@ -167,6 +169,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
     while (gradientModule > 0)
     {
+		previousFace = currentFace;
         currentFace = intersected.back();
 
         currentGradientIntersection = getGradientIntersection(*currentFace);
@@ -182,12 +185,11 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
             if (nextFace != previousFace)
             {
                 std::cout << "Got next face" << std::endl;
-                previousFace = currentFace;
                 intersected.push_back(nextFace);
             }
             else
             {
-                std::cout << "Got maximum edge" << std::endl;
+                std::cout << "Got a face already visited" << std::endl;
                 poppedFaces.push_back(intersected.back());
                 intersected.pop_back();
                 
@@ -217,19 +219,14 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                 Delaunay::Face_handle candidateFromCurrent = currentFace->neighbor(currentFace->index(vertexOppToNeighbor));
                 Delaunay::Face_handle candidateFromPrevious = previousFace->neighbor(previousFace->index(vertexOppToNeighbor));
                 
-                std::cout << "Passed candidates construction" << std::endl;
                                         
                 int gradientIntersectionFromCurrent = log2(getGradientIntersection(*candidateFromCurrent));
                 int gradientIntersectionFromPrevious = log2(getGradientIntersection(*candidateFromPrevious));
                 
-                bool teste1 = gradientIntersectionFromCurrent == candidateFromCurrent->index(nextVertex);
-                std::cout << "From current passed" << std::endl;
-                bool teste2 = gradientIntersectionFromPrevious == candidateFromPrevious->index(nextVertex);
-                std::cout << "From previous passed" << std::endl;
-                
                 if (gradientIntersectionFromCurrent == candidateFromCurrent->index(nextVertex) && 
 					gradientIntersectionFromPrevious == candidateFromPrevious->index(nextVertex)) 
 				{ 
+					std::cout << "Both gradients of candidates point to vertex" << std::endl;
 					break; 
 				}
 				else if (gradientIntersectionFromCurrent != candidateFromCurrent->index(nextVertex) &&
@@ -248,6 +245,7 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 					Vector2D gradientLocal = calcGradientOfTriangle(tr.triangle(candidateFromCurrent));
 					Vector2D previousGradientLocal = calcGradientOfTriangle(tr.triangle(candidateFromPrevious));
                 
+					std::cout << "Calculating gradient of candidates" << std::endl;
 					double gradientModuleLocal = (gradientLocal.x() * gradientLocal.x()) + 
                                         (gradientLocal.y() * gradientLocal.y());
 					double previousModuleLocal = (previousGradientLocal.x() * previousGradientLocal.x()) + 
@@ -255,15 +253,23 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                                         
 					if (gradientModuleLocal <= previousModuleLocal) 
 					{ 
+						std::cout << "Candidate neighbor from current face wins the gradient battle" << std::endl;
 						nextFace = candidateFromCurrent;
 						if (tr.is_infinite(nextFace) || std::find(intersected.begin(), intersected.end(), nextFace) != intersected.end())
-						{ nextFace = candidateFromPrevious; }
+						{ 
+							std::cout << "Candidate neighbor from current already visited or it is infinite" << std::endl;
+							nextFace = candidateFromPrevious; 
+						}
 					}
 					else
 					{ 
+						std::cout << "Candidate neighbor from previous face wins the gradient battle" << std::endl;
 						nextFace = candidateFromPrevious; 
 						if (tr.is_infinite(nextFace) || std::find(intersected.begin(), intersected.end(), nextFace) != intersected.end())
-						{ nextFace = candidateFromCurrent; }
+						{ 
+							std::cout << "Candidate neighbor from previous already visited or it is infinite" << std::endl;
+							nextFace = candidateFromCurrent; 
+						}
 					}
 						
 				}			
@@ -271,18 +277,19 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
                 if (std::find(poppedFaces.begin(), poppedFaces.end(), nextFace) == poppedFaces.end() &&
 					std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
                 {
+					
 					if (nextFace == candidateFromCurrent) 
 					{ 
+						std::cout << "Candidate neighbor from current was elected" << std::endl;
 						intersected.push_back(currentFace); 
 						poppedFaces.pop_back();
-						previousFace = currentFace;
 					}
-					else { previousFace = intersected.back(); }
+					else { currentFace = intersected.back(); }
                     intersected.push_back(nextFace);
                 }
                 else 
                 { 
-					std::cout << "An edge is a maximum" << std::endl;
+					std::cout << "There is no valid neighbor" << std::endl;
 					break; 
 				}
             }
@@ -347,7 +354,6 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Delaunay::Face_handle> &i
 
             if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end())
             {
-                previousFace = currentFace;
                 intersected.push_back(nextFace);
             }
             else
