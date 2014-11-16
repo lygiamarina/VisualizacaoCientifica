@@ -222,7 +222,8 @@ int getGradientIntersection(Delaunay::Face face, Point &intersectedPointOut)
 * Calculates the path to maximum
 * 
 * @param tr Delaunay triangulation (input)
-* @param intersected Vector containing faces of path (output & input)
+* @param intersectedPoints Vector containing points of path (output & input)
+* @param firstFace Start point to path (input)
 **/
 void calcPathToMaximum(const Delaunay& tr, std::vector<Point> &intersectedPoints, Delaunay::Face_handle firstFace)
 {
@@ -565,6 +566,7 @@ GLdouble getProjectedZ(Point position)
 *
 * @param tr  Delaunay triangulation (input)
 * @param seg Line Segment representing ray from mouse click
+* @param intersectedPoints Vector to receive point of click intersection
 * 
 * @return returnIt An iterator to the closes face returned as Face_handle
 **/
@@ -614,7 +616,11 @@ Delaunay::Face_handle getFirstIntersectedFace (const Delaunay& tr, LineSegment s
     return returnIt;
 }
 
-
+/**
+ * Draws the path formed with points
+ * 
+ * @param intersectedPoints A vector containing points to build the path
+ * */
 void draw (const std::vector<Point> intersectedPoints)
 {
 	glEnable(GL_LINE_SMOOTH);
@@ -633,7 +639,6 @@ void draw (const std::vector<Point> intersectedPoints)
  * Draws a Delaunay triangulation
  *
  * @param tr  Delaunay triangulation (inpu#04F100t)
- * @param intersectedFaces A vector containing faces intersected on the path to maximum
  **/
 void draw (const Delaunay& tr)
 {
@@ -674,7 +679,7 @@ void draw (const Delaunay& tr)
  **/
 Delaunay dt; // A Delaunay Triangulation
 LineSegment currentSegment; //Segment for mouse ray
-std::vector<Point> intersectedPoints;
+std::vector<Point> intersectedPoints; //Vector with points of path to max
 
 Point center;  // Center of dt´s minimum enclosing parallelepiped
 int width = 800, height = 600;  // Window size
@@ -682,8 +687,6 @@ int activebutton;  // Which mouse button was pressed
 int xmouse, ymouse;  // Coords where mouse was pressed
 double xangle = 0.0, yangle = 0.0; // Angles for viewing terrain
 double modelview [16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}; // Current modelview matrix
-double rotMatrixX [16] = {1, 0, 0, 0, 0, cos(0.0), -sin(0.0), 0, 0, sin(0.0), cos(0.0), 0, 0, 0, 0, 1};
-double rotMatrixY [16] = {cos(0.0), 0, sin(0.0), 0, 0, 1, 0, 0, -sin(0.0), 0, cos(0.0), 0, 0, 0, 0, 1};
 
 
 void init ()
@@ -774,8 +777,6 @@ void mouseClickHandler (int button, int state, int x, int y)
 	ymouse = y;
 	if (button == GLUT_LEFT_BUTTON) {
 		if (state == GLUT_DOWN) {
-		    //glGetDoublev (GL_MODELVIEW_MATRIX, modelview);
-		    //xangle = 0; yangle = 0;
             createMouseRay(x, y);
             intersectedPoints.clear();
             Delaunay::Face_handle firstFace = getFirstIntersectedFace(dt, currentSegment, intersectedPoints);
