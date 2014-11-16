@@ -53,6 +53,8 @@ void limits(Delaunay& triang, Point3D& min, Point3D& max)
 
 
 
+
+
 Vector2D calculateGradient(Triangle3D face) 
 {
     Vector3D u(face.vertex(0), face.vertex(1));
@@ -69,121 +71,100 @@ Vector2D calculateGradient(Triangle3D face)
     return gradient;
 }
 
-/**
- * Returns an indicator of the which intersection 
- * we got using gradient from face
- * 
- * @param face A Delaunay face
- * @param intersectedPointOut An output to save the point of intersection
- * @return int An integer power of 2 representing the intersection
- **/
-int getGradientIntersection(Delaunay::Face face, Point3D &intersectedPointOut) {
-    /*
-     * Vertex(0): return 1 > log2(1) = 0
-     * Vertex(1): return 2 > log2(2) = 1
-     * Vertex(2): return 4 > log2(4) = 2
-     * Edge opposite to Vertex(0): return 8 > log2(8) = 3 => 3-3 = 0
-     * Edge opposite to Vertex(1): return 16 > log2(16) = 4 => 4-3 = 1
-     * Edge opposite to Vertex(2): return 32 > log2(32) = 5 => 5-3 = 2
-     */
+double getNewZ(Plane3D trianglePlane, Point2D intersectedPoint)
+{
+    double newZ = -trianglePlane.a() * intersectedPoint.x();
+    newZ += -trianglePlane.b() * intersectedPoint.y();
+    newZ += -trianglePlane.d();
+    newZ = newZ / trianglePlane.c();
+    
+    return newZ;
+}
 
-    Vector2D gradient;
-    double gradientModule;
 
-    Point3D p, q, r;
-    Point2D p2D, q2D, r2D, source2D;
-    Triangle2D projectedTriangle;
-    LineSegment2D edgePQ, edgeQR, edgeRP;
+int getGradientIntersection(Delaunay::Face face, Point3D &intersectedPointOut) 
+{
+    Point3D p = (*(face.vertex(0))).point();
+    Point3D q = (*(face.vertex(1))).point();
+    Point3D r = (*(face.vertex(2))).point();
+    
+    //Transforming above points to 2D for intersection detection
+    Point2D p2D = Point2D(p.x(), p.y());
+    Point2D q2D = Point2D(q.x(), q.y());
+    Point2D r2D = Point2D(r.x(), r.y());
+    
+    //Creating a 2D triangle with above points
+    Triangle2D projectedTriangle = Triangle2D(p2D, q2D, r2D);
+    
+    //Representing the edges of the above 2D triangle
+    LineSegment2D edgePQ = LineSegment2D(p2D, q2D);
+    LineSegment2D edgeQR = LineSegment2D(q2D, r2D);
+    LineSegment2D edgeRP = LineSegment2D(r2D, p2D);
 
-    Ray2D gradientRay;
-    CGAL::Object gradientIntersection;
-
-    Point2D intersectedPoint;
-
-    Plane3D trianglePlane;
-
-    p = (*(face.vertex(0))).point();
-    q = (*(face.vertex(1))).point();
-    r = (*(face.vertex(2))).point();
-
-    trianglePlane = Plane3D(p, q, r);
-
-    p2D = Point2D(p.x(), p.y());
-    q2D = Point2D(q.x(), q.y());
-    r2D = Point2D(r.x(), r.y());
-
-    edgePQ = LineSegment2D(p2D, q2D);
-    edgeQR = LineSegment2D(q2D, r2D);
-    edgeRP = LineSegment2D(r2D, p2D);
-
-    projectedTriangle = Triangle2D(p2D, q2D, r2D);
-    source2D = CGAL::centroid(projectedTriangle);
-
-    gradient = calculateGradient(Triangle3D(p, q, r));
-    gradientModule = sqrt((gradient.x() * gradient.x()) + (gradient.y() * gradient.y()));
-    if (gradientModule > 0) {
+    //Calculating the gradient of the triangle
+    Vector2D gradient = calculateGradient(Triangle3D(p, q, r));
+    double gradientModule = sqrt((gradient.x() * gradient.x()) + (gradient.y() * gradient.y()));
+    if (gradientModule > 0) 
+    {
         gradient = Vector2D(gradient.x() / gradientModule, gradient.y() / gradientModule);
     }
-    gradientRay = Ray2D(source2D, gradient);
+    Point2D source2D = CGAL::centroid(projectedTriangle);
+    Ray2D gradientRay = Ray2D(source2D, gradient); //Used only for intersection detection
 
-    std::cout << "Gradient: " << gradient << std::endl;
-
-    if (gradientRay.has_on(p2D)) {
-        std::cout << "Intersected p" << std::endl;
+    
+    //Checking gradient intersection with the triangle points
+    if (gradientRay.has_on(p2D)) 
+    {
         intersectedPointOut = p;
         return 1;
     }
-
-    if (gradientRay.has_on(q2D)) {
-        std::cout << "Intersected q" << std::endl;
+    if (gradientRay.has_on(q2D)) 
+    {
         intersectedPointOut = q;
         return 2;
     }
-
-    if (gradientRay.has_on(r2D)) {
-        std::cout << "Intersected r" << std::endl;
+    if (gradientRay.has_on(r2D)) 
+    {
         intersectedPointOut = r;
         return 4;
     }
 
+    //Checking gradient intersection with the triangle edges
+    CGAL::Object gradientIntersection;
+
+    Plane3D trianglePlane = Plane3D(p, q, r);
+    
+    Point2D newIntersectedPoint;
+    
     gradientIntersection = CGAL::intersection(edgeQR, gradientRay);
-    if (gradientIntersection != NULL) {
-        std::cout << "Intersected QR" << std::endl;
-        Point2D auxPoint;
-        if (CGAL::assign(auxPoint, gradientIntersection)) {
-            double pointZ = -trianglePlane.a() * auxPoint.x();
-            pointZ += -trianglePlane.b() * auxPoint.y();
-            pointZ += -trianglePlane.d();
-            pointZ = pointZ / trianglePlane.c();
-            intersectedPointOut = Point3D(auxPoint.x(), auxPoint.y(), pointZ);
+    if (gradientIntersection != NULL) 
+    {
+        if (CGAL::assign(newIntersectedPoint, gradientIntersection)) 
+        {
+            double pointZ = getNewZ(trianglePlane, newIntersectedPoint);
+            intersectedPointOut = Point3D(newIntersectedPoint.x(), newIntersectedPoint.y(), pointZ);
             return 8;
         }
     }
 
     gradientIntersection = CGAL::intersection(edgeRP, gradientRay);
-    if (gradientIntersection != NULL) {
-        std::cout << "Intersected RP" << std::endl;
-        Point2D auxPoint;
-        if (CGAL::assign(auxPoint, gradientIntersection)) {
-            double pointZ = -trianglePlane.a() * auxPoint.x();
-            pointZ += -trianglePlane.b() * auxPoint.y();
-            pointZ += -trianglePlane.d();
-            pointZ = pointZ / trianglePlane.c();
-            intersectedPointOut = Point3D(auxPoint.x(), auxPoint.y(), pointZ);
+    if (gradientIntersection != NULL) 
+    {
+        if (CGAL::assign(newIntersectedPoint, gradientIntersection)) 
+        {
+            double pointZ = getNewZ(trianglePlane, newIntersectedPoint);
+            intersectedPointOut = Point3D(newIntersectedPoint.x(), newIntersectedPoint.y(), pointZ);
             return 16;
         }
     }
 
     gradientIntersection = CGAL::intersection(edgePQ, gradientRay);
-    if (gradientIntersection != NULL) {
-        std::cout << "Intersected PQ" << std::endl;
-        Point2D auxPoint;
-        if (CGAL::assign(auxPoint, gradientIntersection)) {
-            double pointZ = -trianglePlane.a() * auxPoint.x();
-            pointZ += -trianglePlane.b() * auxPoint.y();
-            pointZ += -trianglePlane.d();
-            pointZ = pointZ / trianglePlane.c();
-            intersectedPointOut = Point3D(auxPoint.x(), auxPoint.y(), pointZ);
+    if (gradientIntersection != NULL) 
+    {
+        if (CGAL::assign(newIntersectedPoint, gradientIntersection)) 
+        {
+            double pointZ = getNewZ(trianglePlane, newIntersectedPoint);
+            intersectedPointOut = Point3D(newIntersectedPoint.x(), newIntersectedPoint.y(), pointZ);
             return 32;
         }
     }
@@ -192,16 +173,24 @@ int getGradientIntersection(Delaunay::Face face, Point3D &intersectedPointOut) {
     returnPoint = returnPoint.z() < r.z() ? returnPoint : r;
     intersectedPointOut = returnPoint;
 
-    if (returnPoint == p) {
+    if (returnPoint == p) 
+    {
         return 1;
-    } else if (returnPoint == q) {
+    } 
+    else if (returnPoint == q) 
+    {
         return 2;
-    } else if (returnPoint == r) {
+    } 
+    else if (returnPoint == r) 
+    {
         return 4;
     }
 
+    //cout << "Gradient Value: " << gradientRay << endl;
+    
     return 0;
 }
+
 
 
 
