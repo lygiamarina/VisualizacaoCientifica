@@ -30,9 +30,9 @@ else ifeq ($(OS),osx)
 endif
 
 # **********************************************************************************
-all:	terrain$(EXT)
+all:	terrainRodolfo
 
-terrain$(EXT):	terrain.o
+terrainRodolfo:	terrainRodolfo.o
 	$(CXX)  -o $@ $^ $(CFLAGS) $(LIBPATH) $(LDFLAGS) -lglut -lGLU -lGL
 
 .c.o:	$*.h
@@ -42,7 +42,7 @@ terrain$(EXT):	terrain.o
 	$(CXX) -c $(CFLAGS) $*.cpp
 
 clean:
-	rm *.o terrain$(EXT)
+	rm *.o terrainRodolfo
 	rm *~
 
 .C.o:	$*.h
