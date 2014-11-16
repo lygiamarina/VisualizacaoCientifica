@@ -83,6 +83,7 @@ Vector2D calcGradientOfTriangle(Triangle face)
 * we got using gradient from face
 * 
 * @param face A Delaunay face
+* @param intersectedPointOut An output to save the point of intersection
 * @return int An integer power of 2 representing the intersection
 **/
 int getGradientIntersection(Delaunay::Face face, Point &intersectedPointOut)
