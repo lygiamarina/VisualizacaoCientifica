@@ -200,139 +200,143 @@ void calculatePath(const Delaunay& tr, std::vector<Point3D> &pathPoints,
 
     std::vector<Delaunay::Face_handle> intersected;
     Delaunay::Face_handle currentFace;
-
-
+    
     Point3D currentIntersectedPoint;
 
     std::vector<Delaunay::Vertex_handle> visitedVertices;
     bool gotVertex = false;
-    bool gotMaximumEdge = false;
+    bool walkOnEdge = false;
     bool foundMax = false;
 
     int currentGradientIntersection;
 
     intersected.push_back(firstFace);
 
-    while (!foundMax) {
-        //Am I dealing with a face?
-        if (!gotVertex) {
+    while (!foundMax) 
+    {
+        if (!gotVertex) 
+        {
             currentFace = intersected.back();
 
             currentGradientIntersection = getGradientIntersection(*currentFace, currentIntersectedPoint);
 
-            //Is gradient intersecting nothing like vertex or edge?
-            if (currentGradientIntersection == 0) {
-                std::cout << "Error on gradient intersection calc" << std::endl;
-                break;
-            }                //Is gradient intersecting edge?
-            else if (currentGradientIntersection > 4) {
-                std::cout << "Current gradient integer pointing to edge: " << currentGradientIntersection << std::endl;
+            //Intersection with edges
+            if (currentGradientIntersection > 4) 
+            {
                 int indexForNextFace = log2(currentGradientIntersection) - 3;
                 Delaunay::Face_handle nextFace = currentFace->neighbor(indexForNextFace);
 
-                std::cout << "Got neighbor" << std::endl;
-
-                //Is neighbor face valid and not visited yet?
-                if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end() && !tr.is_infinite(nextFace)) {
-                    std::cout << "Got next face" << std::endl;
+                //Checking if face is not already visited and is not infinite
+                if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end() && !tr.is_infinite(nextFace)) 
+                {
+                    //cout << "Next face found!" << endl;
                     pathPoints.push_back(currentIntersectedPoint);
                     intersected.push_back(nextFace);
                     gotVertex = false;
-                }                    //Neighbor face is not valid or it's been already visited
-                else {
-                    std::cout << "Got a face already visited" << std::endl;
-
-                    gotMaximumEdge = true;
+                }                   
+                else 
+                {
+                    //Let's walk on the edge
+                    walkOnEdge = true;
 
                     Delaunay::Vertex_handle q;
                     Delaunay::Vertex_handle r;
 
-                    if (indexForNextFace == 0) {
+                    if (indexForNextFace == 0) 
+                    {
                         q = currentFace->vertex(1);
                         r = currentFace->vertex(2);
-                    } else if (indexForNextFace == 1) {
+                    } 
+                    else if (indexForNextFace == 1) 
+                    {
                         q = currentFace->vertex(0);
                         r = currentFace->vertex(2);
-                    } else if (indexForNextFace == 2) {
+                    } 
+                    else if (indexForNextFace == 2) 
+                    {
                         q = currentFace->vertex(0);
                         r = currentFace->vertex(1);
                     }
-
-
+                    
                     Delaunay::Vertex_handle nextVertex = q->point().z() > r->point().z() ? q : r;
 
-                    //Is elected vertex valid and not visited yet?
+                    //Checking if vertex is not already visited and is not infinite
                     if (!tr.is_infinite(nextVertex) && std::find(visitedVertices.begin(), visitedVertices.end(), nextVertex) == visitedVertices.end()) {
                         pathPoints.push_back(nextVertex->point());
                         visitedVertices.push_back(nextVertex);
                         gotVertex = true;
-                    }                        //Elected vertex is not valid or it's been visited before
-                    else {
+                    }                        
+                    else 
+                    {
+                        //Checking if vertex is not already visited and is not infinite
                         nextVertex = nextVertex == q ? r : q;
-                        if (!tr.is_infinite(nextVertex) && std::find(visitedVertices.begin(), visitedVertices.end(), nextVertex) == visitedVertices.end()) {
+                        if (!tr.is_infinite(nextVertex) && std::find(visitedVertices.begin(), visitedVertices.end(), nextVertex) == visitedVertices.end()) 
+                        {
                             pathPoints.push_back(nextVertex->point());
                             visitedVertices.push_back(nextVertex);
                             gotVertex = true;
-                        } else {
-                            std::cout << "Got infinite vertices" << std::endl;
+                        } 
+                        //No more vertices to visit on this face
+                        else 
+                        {
                             gotVertex = false;
                             break;
                         }
                     }
                 }
             }
-                //Is gradient intersecting vertex?
-            else if (currentGradientIntersection < 8) {
-                std::cout << "Current gradient integer pointing to vertex: " << currentGradientIntersection << std::endl;
+            //Intersection with a vertex
+            else if (currentGradientIntersection < 8) 
+            {
                 int indexForVertex = log2(currentGradientIntersection);
                 Delaunay::Vertex_handle vertex = currentFace->vertex(indexForVertex);
 
-                //Is vertex valid?
-                if (!tr.is_infinite(vertex) && std::find(visitedVertices.begin(), visitedVertices.end(), vertex) == visitedVertices.end()) {
+                //Checking if vertex is not already visited and is not infinite
+                if (!tr.is_infinite(vertex) && std::find(visitedVertices.begin(), visitedVertices.end(), vertex) == visitedVertices.end()) 
+                {
                     pathPoints.push_back(currentIntersectedPoint);
                     visitedVertices.push_back(vertex);
                     gotVertex = true;
-                } else {
-                    std::cout << "Gradient pointing to a vertex already visited" << std::endl;
-                    break;
                 }
             }
-        }            //Am I dealing with a vertex?
-        else {
-            std::cout << "Got vertex" << std::endl;
+        }            
+        else 
+        {
             Delaunay::Vertex_handle currentVertex = visitedVertices.back();
 
-            //Am I dealing with a vertex to which gradient was pointing?
-            //If yes, search incident faces
-            if (!gotMaximumEdge) {
-                std::cout << "Searching faces" << std::endl;
+            //We search for new faces if we're not walking on an edge
+            if (!walkOnEdge) 
+            {
                 Delaunay::Face_circulator faceCt = tr.incident_faces(currentVertex), done(faceCt);
 
                 bool foundValidFacePath = false;
 
-                while (tr.is_infinite(faceCt)) {
+                while (tr.is_infinite(faceCt)) 
+                {
                     faceCt++;
-                    if (faceCt == done) {
-                        std::cout << "There is only infinite faces" << std::endl;
+                    //If there aren't non infinite faces or not visited ones
+                    if (faceCt == done) 
+                    {
                         break;
                     }
                 }
 
                 Delaunay::Face_handle searchedFace = faceCt;
+                
                 Vector2D currentGradientLocal = calculateGradient(tr.triangle(searchedFace));
                 double currentGradientModuleLocal = (currentGradientLocal.x() * currentGradientLocal.x()) +
                         (currentGradientLocal.y() * currentGradientLocal.y());
                 double previousGradientModuleLocal = currentGradientModuleLocal;
 
                 if (!tr.is_infinite(searchedFace) &&
-                        std::find(intersected.begin(), intersected.end(), searchedFace) == intersected.end()) {
+                        std::find(intersected.begin(), intersected.end(), searchedFace) == intersected.end()) 
+                {
                     foundValidFacePath = true;
                 }
 
                 faceCt++;
 
-                //Searching for faces where gradient points to an opposite edge
-                //I pick the face that has the greater gradient module. Why? It goes up faster
+                //Getting the face with greater gradient
                 while (faceCt != done) {
                     if (std::find(intersected.begin(), intersected.end(), faceCt) == intersected.end() && !tr.is_infinite(faceCt)) {
                         Point3D auxPoint;
@@ -353,24 +357,28 @@ void calculatePath(const Delaunay& tr, std::vector<Point3D> &pathPoints,
                     faceCt++;
                 }
 
-                //Is there a valid face to keep walking?
-                if (foundValidFacePath) {
-                    std::cout << "Found valid face path" << std::endl;
+                if (foundValidFacePath) 
+                {
                     intersected.push_back(searchedFace);
                     gotVertex = false;
-                }                    //Should I try walk on edges?
-                else {
+                }                    
+                else 
+                {
                     gotVertex = true;
-                    gotMaximumEdge = true;
+                    walkOnEdge = true;
                 }
-            }                //Am I dealing with a vertex from a maximum edge?
-            else {
-                std::cout << "Searching edges" << std::endl;
+            }   
+            //Walking on edges
+            else 
+            {
                 Delaunay::Edge_circulator edgeCt = tr.incident_edges(currentVertex), doneEdge(edgeCt);
 
-                while (tr.is_infinite(edgeCt)) {
+                while (tr.is_infinite(edgeCt)) 
+                {
                     edgeCt++;
-                    if (edgeCt == doneEdge) {
+                    //If there aren't non infinite edges or not visited ones
+                    if (edgeCt == doneEdge) 
+                    {
                         break;
                     }
                 }
@@ -383,6 +391,7 @@ void calculatePath(const Delaunay& tr, std::vector<Point3D> &pathPoints,
                 //Next vertex can't be the current vertex
                 Delaunay::Vertex_handle nextVertexLocal = currentVertex == vertexA ? vertexB : vertexA;
 
+                //Checking if edge is non infinite and not visited
                 while (tr.is_infinite(nextVertexLocal) && ++edgeCt != doneEdge) {
                     searchedEdge = *edgeCt;
                     vertexA = searchedEdge.first->vertex((searchedEdge.second + 1) % 3);
@@ -403,11 +412,11 @@ void calculatePath(const Delaunay& tr, std::vector<Point3D> &pathPoints,
 
                 edgeCt++;
 
-                //Searching edges that has the greater Z
-                //Can't figure out why the hell I should look for greater Z if the z-axis grows on another direction
-                //But it works...
-                while (edgeCt != doneEdge) {
-                    if (!tr.is_infinite(edgeCt)) {
+                //Getting edge with greater Z
+                while (edgeCt != doneEdge) 
+                {
+                    if (!tr.is_infinite(edgeCt)) 
+                    {
                         Delaunay::Edge localEdge = *edgeCt;
                         vertexA = localEdge.first->vertex((localEdge.second + 1) % 3);
                         vertexB = localEdge.first->vertex((localEdge.second + 2) % 3);
@@ -428,25 +437,36 @@ void calculatePath(const Delaunay& tr, std::vector<Point3D> &pathPoints,
                     edgeCt++;
                 }
 
-                //Is there a valid edge to keep walking?
-                if (foundValidEdgePath) {
+                if (foundValidEdgePath) 
+                {
                     vertexA = searchedEdge.first->vertex((searchedEdge.second + 1) % 3);
                     vertexB = searchedEdge.first->vertex((searchedEdge.second + 2) % 3);
 
                     nextVertexLocal = currentVertex == vertexA ? vertexB : vertexA;
-
-                    if (!tr.is_infinite(nextVertexLocal)) {
+                    
+                    //If there are non infinite vertices remaining
+                    if (!tr.is_infinite(nextVertexLocal)) 
+                    {
                         pathPoints.push_back(nextVertexLocal->point());
                         visitedVertices.push_back(nextVertexLocal);
                         gotVertex = true;
-                    } else {
-                        std::cout << "Found maximum because next vertex is infinite" << std::endl;
+                    } 
+                    //Local maximum obtained!
+                    else 
+                    {
+                        cout << "Local Maximum found at: "<< pathPoints.back()[0] << ", "
+                                                          << pathPoints.back()[1] << ", "
+                                                          << pathPoints.back()[0] << endl;
                         foundMax = true;
                         break;
                     }
-                }                    //So... have I found the maximum?
-                else {
-                    std::cout << "Found maximum because there is no vertex with minor z" << std::endl;
+                }    
+                //Local maximum obtained!
+                else 
+                {
+                    cout << "Local Maximum found at: "<< pathPoints.back()[0] << ", "
+                                                      << pathPoints.back()[1] << ", "
+                                                      << pathPoints.back()[0] << endl;
                     foundMax = true;
                     break;
                 }
@@ -546,6 +566,7 @@ void drawPath(const std::vector<Point3D> pathPoints)
     {
         Point3D p = pathPoints[i];
         glVertex3f(p[0], p[1], p[2]);
+        
     }
     glEnd();
     
