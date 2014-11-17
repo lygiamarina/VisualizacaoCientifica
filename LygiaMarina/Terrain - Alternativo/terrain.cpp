@@ -136,26 +136,21 @@ int getGradientIntersection(Delaunay::Face face, Point &intersectedPointOut)
 		gradient = Vector2D(gradient.x()/gradientModule, gradient.y()/gradientModule);
 	}
     gradientRay = Ray2D(source2D, gradient);
-    
-    std::cout << "Gradient: " << gradient << std::endl;
 
     if (gradientRay.has_on(p2D)) 
     { 
-		std::cout << "Intersected p" << std::endl;
 		intersectedPointOut = p;
 		return 1; 
 	}
 
     if (gradientRay.has_on(q2D)) 
     { 
-		std::cout << "Intersected q" << std::endl;
 		intersectedPointOut = q;
 		return 2; 
 	}
 
     if (gradientRay.has_on(r2D)) 
     { 
-		std::cout << "Intersected r" << std::endl;
 		intersectedPointOut = r;
 		return 4; 
 	}
@@ -163,7 +158,6 @@ int getGradientIntersection(Delaunay::Face face, Point &intersectedPointOut)
     gradientIntersection = CGAL::intersection(edgeQR, gradientRay);
     if (gradientIntersection != NULL) 
     { 
-		std::cout << "Intersected QR" << std::endl;
 		Point2D auxPoint;
 		if (CGAL::assign(auxPoint, gradientIntersection))
 		{
@@ -179,7 +173,6 @@ int getGradientIntersection(Delaunay::Face face, Point &intersectedPointOut)
     gradientIntersection = CGAL::intersection(edgeRP, gradientRay);
     if (gradientIntersection != NULL) 
     { 
-		std::cout << "Intersected RP" << std::endl;
 		Point2D auxPoint;
 		if (CGAL::assign(auxPoint, gradientIntersection))
 		{
@@ -195,7 +188,6 @@ int getGradientIntersection(Delaunay::Face face, Point &intersectedPointOut)
     gradientIntersection = CGAL::intersection(edgePQ, gradientRay);
     if (gradientIntersection != NULL) 
     { 
-		std::cout << "Intersected PQ" << std::endl;
 		Point2D auxPoint;
 		if (CGAL::assign(auxPoint, gradientIntersection))
 		{
@@ -267,8 +259,6 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Point> &intersectedPoints
 				std::cout << "Current gradient integer pointing to edge: " << currentGradientIntersection << std::endl;
 				int indexForNextFace = log2(currentGradientIntersection) - 3;
 				Delaunay::Face_handle nextFace = currentFace->neighbor(indexForNextFace);
-
-				std::cout << "Got neighbor" << std::endl;
 
 				//Is neighbor face valid and not visited yet?
 				if (std::find(intersected.begin(), intersected.end(), nextFace) == intersected.end() && !tr.is_infinite(nextFace))
@@ -422,7 +412,6 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Point> &intersectedPoints
 				//Is there a valid face to keep walking?
 				if (foundValidFacePath)
 				{
-					std::cout << "Found valid face path" << std::endl;
 					intersected.push_back(searchedFace);
 					gotVertex = false;
 				}
@@ -528,7 +517,8 @@ void calcPathToMaximum(const Delaunay& tr, std::vector<Point> &intersectedPoints
 				//So... have I found the maximum?
 				else
 				{
-					std::cout << "Found maximum because there is no vertex with minor z" << std::endl;
+					std::cout << "Found maximum" << std::endl;
+					std::cout << "Maximum point: " << intersectedPoints.back() << std::endl;
 					foundMax = true;
 					break;
 				}
