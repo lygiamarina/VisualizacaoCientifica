@@ -1,5 +1,6 @@
 #include "Cell.h"
 #include "math.h"
+#include <iostream>
 
 Cell::Cell()
 {
@@ -32,6 +33,19 @@ Cell::Cell(double horVelocity, double verVelocity)
 Cell::~Cell()
 {
 	delete [] this->center;
+}
+
+Cell& Cell::operator=(const Cell& inCell)
+{
+	this->horizontalVelocity = inCell.horizontalVelocity;
+	this->verticalVelocity = inCell.verticalVelocity;
+	this->isFluid = inCell.isFluid;
+	
+	this->center = inCell.center;
+	
+	this->edgesVel = inCell.edgesVel;
+	
+	return *this;
 }
 
 double Cell::getHorVelocity()
@@ -86,12 +100,16 @@ void Cell::setEdgeVel(std::string edge, double velocity)
 
 bool Cell::getIsFluidFlag()
 {
-	bool horVel = this->edgesVel["Left"] != 0 || this->edgesVel["Right"] != 0;
+	bool horVel = this->edgesVel["Left"] != 0.0 || this->edgesVel["Right"] != 0.0;
 	
-	bool verVel = this->edgesVel["Up"] != 0 || this->edgesVel["Up"] != 0;
+	bool verVel = this->edgesVel["Up"] != 0.0 || this->edgesVel["Up"] != 0.0;
 	
 	if (horVel || verVel)
 	{
+		if (this->isFluid == false)
+		{
+			std::cout << "got" << std::endl;
+		}
 		this->setIsFluidFlag(true);
 	}
 	

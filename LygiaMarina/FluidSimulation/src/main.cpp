@@ -3,10 +3,11 @@
 #include "math.h"
 #include <GL/glut.h>
 #include <iostream>
+#include <unistd.h>
 
 #define WIDTH 640
 #define HEIGHT 480
-#define CELL_SIZE 20.0
+#define CELL_SIZE 20
 #define INIT_VEL 16.0
 #define GRAVITY 10.0
 
@@ -15,12 +16,11 @@
 //--------------------------------------------------------------------//
 int horizontalN;
 int verticalN;
-bool calcVel;
 int t;
-Cell **currentGrid;
-Cell **previousGrid;
-//Cell currentGrid[24][32];
-//Cell previousGrid[24][32];
+//Cell **currentGrid;
+//Cell **previousGrid;
+Cell currentGrid[26][34];
+Cell previousGrid[26][34];
 
 //--------------------------------------------------------------------//
 // Drawing Function                                                   //
@@ -35,15 +35,20 @@ void recalcVelocity()
 			previousGrid[i][j] = currentGrid[i][j];
 		}
 	}
-	
+
 	for (int i = 1; i < verticalN+1; i++)
 	{
 		for (int j = 1; j < horizontalN+1; j++)
 		{
-			bool border = false;
-			if (i == 1 || i == verticalN || j == 1 || j == horizontalN)
+			bool borderI = false;
+			bool borderJ = false;
+			if (i == 1 || i == verticalN)
 			{
-				border = true;
+				borderI = true;
+			}
+			if (j == 1 || j == horizontalN)
+			{
+				borderJ = true;
 			}
 			if (previousGrid[i][j].getIsFluidFlag())
 			{
@@ -68,7 +73,7 @@ void recalcVelocity()
 				double duuHorizontal;
 				duuHorizontal = DUU(LL, L, M, R, RR, 
 						CELL_SIZE, CELL_SIZE, CELL_SIZE, CELL_SIZE, 
-						1.0, border);
+						1.0, borderJ);
 						
 				//------------------------------------------------//
 				// DUV Horizontal                                 //
@@ -84,7 +89,7 @@ void recalcVelocity()
 				double duvHorizontal;
 				duvHorizontal = DUV(LL, L, M, R, RR, KL, KR, 
 						CELL_SIZE, CELL_SIZE, CELL_SIZE, CELL_SIZE, CELL_SIZE,
-						1.0, border);
+						1.0, borderJ);
 						
 				//------------------------------------------------//
 				// DUU Vertical                                   //
@@ -107,10 +112,10 @@ void recalcVelocity()
 				double duuVertical;
 				duuVertical = DUU(LL, L, M, R, RR, 
 						CELL_SIZE, CELL_SIZE, CELL_SIZE, CELL_SIZE, 
-						1.0, border);
+						1.0, borderI);
 						
 				//------------------------------------------------//
-				// DUV Horizontal                                 //
+				// DUV Vertical                                   //
 				//------------------------------------------------//
 				KLHor = previousGrid[i-1][j].getHorVelocity();
 				KLVer = previousGrid[i-1][j].getVerVelocity();
@@ -123,15 +128,17 @@ void recalcVelocity()
 				double duvVertical;
 				duvVertical = DUV(LL, L, M, R, RR, KL, KR, 
 						CELL_SIZE, CELL_SIZE, CELL_SIZE, CELL_SIZE, CELL_SIZE,
-						1.0, border);
+						1.0, borderI);
 				
 				double horizontalVel = KRHor - (duuHorizontal+duvVertical)*t;
 				double verticalVel = KRVer - (duvHorizontal+duuVertical)*t;
 				
 				currentGrid[i][j].setEdgeVel("Left", horizontalVel);
-				currentGrid[i][j].setEdgeVel("Down", verticalVel);
+				currentGrid[i][j].setEdgeVel("Down", verticalVel+GRAVITY*t);
+				
 				currentGrid[i][j-1].setEdgeVel("Right", horizontalVel);
-				currentGrid[i-1][j].setEdgeVel("Up", verticalVel);
+				currentGrid[i-1][j].setEdgeVel("Up", verticalVel+GRAVITY*t);
+
 			}
 		}
 	}
@@ -165,8 +172,9 @@ void drawVelocity()
 	glEnd ();
 	glFlush();
 	
-	/*recalcVelocity();
-	glutPostRedisplay();*/
+	sleep(1);
+	recalcVelocity();
+	glutPostRedisplay();
 	
 }
 
@@ -178,30 +186,26 @@ int main(int argc, char **argv)
 	// Initialization                                                 //
 	//----------------------------------------------------------------//
 	t = 1;
-	calcVel = true;
 	
 	horizontalN = WIDTH/CELL_SIZE;
 	verticalN = HEIGHT/CELL_SIZE;
 
-	currentGrid = new Cell*[verticalN+2];
-	previousGrid = new Cell*[verticalN+2];
+	/*currentGrid = new Cell*[verticalN+2];
+	previousGrid = new Cell*[verticalN+2];*/
 	
-	for (int i = 0; i < verticalN+2; i++)
+	for (int i = 1; i < verticalN+1; i++)
 	{
-		currentGrid[i] = new Cell[horizontalN+2];
-		previousGrid[i] = new Cell[horizontalN+2];
+		/*currentGrid[i] = new Cell[horizontalN+2];
+		previousGrid[i] = new Cell[horizontalN+2];*/
 		
-		for (int j = 0; j < horizontalN+2; j++)
+		for (int j = 1; j < horizontalN+1; j++)
 		{
-			currentGrid[i][j].setCenter(CELL_SIZE*(i+1/2), CELL_SIZE*(j+1/2));
-			if (j >= horizontalN/4 || i <= 3*horizontalN/4)
-			{				
-				//currentGrid[i][0].setEdgeVel("Left", INIT_VEL);
-				//currentGrid[i][0].setEdgeVel("Down", GRAVITY);
-				
-				currentGrid[1][j].setEdgeVel("Left", INIT_VEL);
-				currentGrid[1][j].setEdgeVel("Down", GRAVITY);
-				currentGrid[1][j].setIsFluidFlag(true);
+			currentGrid[i][j].setCenter(CELL_SIZE*(j-1+0.5), CELL_SIZE*(i-1+0.5));
+			if (i >= verticalN/4 && i <= 3*verticalN/4)
+			{	
+				currentGrid[i][0].setEdgeVel("Right", INIT_VEL);
+				currentGrid[i][1].setEdgeVel("Left", INIT_VEL);
+				currentGrid[i][1].setIsFluidFlag(true);
 			}
 		}
 	}

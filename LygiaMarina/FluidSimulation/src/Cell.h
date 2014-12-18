@@ -19,6 +19,8 @@ public:
 	Cell(double horVelocity, double verVelocity);
 	~Cell();
 	
+	Cell& operator=(const Cell& inCell);
+	
 	double getHorVelocity();
 	
 	double getVerVelocity();
